@@ -279,16 +279,13 @@ def handle_select_wash_menu(
         )
         if select_wash_outcome == SelectWashOutcome.BALANCE_LESS_THAN_WASH_PRICE:
             print(INSUFFICIENT_FUNDS_DISPLAY)
-        if select_wash_outcome == SelectWashOutcome.BALANCE_EQUALS_TO_WASH_PRICE:
-            washing_machine_state.reset_balance(wash_price)
-            wash_time = get_wash_time(select_wash_input)
-            print(START_WASH_DISPLAY)
-            print(END_WASH_DISPLAY)
-            break
         if select_wash_outcome == SelectWashOutcome.BALANCE_MORE_THAN_WASH_PRICE:
             refund_amount = get_refund_amount(washing_machine_state.balance, wash_price)
             show_refund_excess_message(refund_amount)
-
+        if (
+            select_wash_outcome == SelectWashOutcome.BALANCE_MORE_THAN_WASH_PRICE
+            or select_wash_outcome == SelectWashOutcome.BALANCE_EQUALS_TO_WASH_PRICE
+        ):
             washing_machine_state.reset_balance(wash_price)
             wash_time = get_wash_time(select_wash_input)
             washing_machine_statistics.add_money_earned(wash_price)
