@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from enum import Enum, auto
 
 DEFAULT_WALLET_BALANCE = 0.00
@@ -106,3 +107,42 @@ Otherwise, press [0] to go back"""
 STATISTICS_RESET_DISPLAY = """
 All statistics has been reset
 """
+
+INVALID_SELECTION_DISPLAY = """
+You have selected an invalid option. Please try again
+"""
+
+
+@dataclass
+class MachineStatistics:
+    total_time_switched_on_hours: int = 0
+    money_earned: float = 0.01
+
+    def __str__(self):
+        return f"""Total time switched on: {self.total_time_switched_on_hours} hours
+Balance: ${self.money_earned:.2f}"""
+
+
+def show_wallet_balance(balance: float) -> None:
+    print(f"Current balance: ${balance}")
+
+
+def show_statistics(machine_statistics: MachineStatistics) -> None:
+    print(machine_statistics)
+
+
+def show_insert_coin_success_message(coin_value: float) -> None:
+    print(f"Ding! ${coin_value} successfully added to your wallet")
+
+
+def show_refund_excess_message(excess_amount: float) -> None:
+    print(f"Clonk clonk. ${excess_amount} refunded")
+
+
+def show_washing_job_progress(
+    progress_percentage: float, remaining_time_minutes: int
+) -> None:
+    print(
+        f"""Current progress: {progress_percentage * 100:.0f}%
+Remaining time: {remaining_time_minutes} mins"""
+    )
