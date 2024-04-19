@@ -1,13 +1,15 @@
 from enum import Enum, auto
 
+DEFAULT_WALLET_BALANCE = 0.00
+
 
 class StartMenu(Enum):
-    USE_MACHINE = auto()
-    VIEW_MANTENANCE_MENU = auto()
+    GO_TO_USE_MACHINE_MENU = auto()
+    GO_TO_MANTENANCE_MENU = auto()
     EXIT = auto()
 
 
-class MachineMenu(Enum):
+class UseMachineMenu(Enum):
     INSERT_COINS = auto()
     SELECT_WASH = auto()
     GO_BACK = auto()
@@ -17,6 +19,7 @@ class InsertCoinsMenu(Enum):
     INSERT_TEN_CENTS = auto()
     INSERT_TWENTY_CENTS = auto()
     INSERT_FIFTY_CENTS = auto()
+    INSERT_ONE_DOLLAR = auto()
     GO_BACK = auto()
 
 
@@ -29,7 +32,7 @@ class SelectWashMenu(Enum):
 
 
 class PostWashMenu(Enum):
-    USE_MACHINE = auto()
+    GO_TO_USE_MACHINE_MENU = auto()
     EXIT = auto()
 
 
@@ -51,7 +54,7 @@ How may we assist you today?
 [2] Exit"""
 
 EXIT_DISPLAY = """Goodbye"""
-MACHINE_MENU_DISPLAY = """
+USE_MACHINE_MENU_DISPLAY = """
 Please select one of the following options:
 
 [1] Insert coins
@@ -65,12 +68,12 @@ Please choose one of the following coins to insert:
 [1] 10c
 [2] 20c
 [3] 50c
+[4] $1
 
-Otherwise, press [0] to go back"""
+Otherwise, press [5] to go back"""
 
 SELECT_WASH_MENU_DISPLAY = """
 Please select one of the following washes:
-
 
 [1] Quick Wash: 10 mins - $2.00
 [2] Mild Wash: 30 mins - $2.50
@@ -98,3 +101,8 @@ MAINTANENCE_MENU = """
 [2] Reset statistics
 
 Otherwise, press [0] to go back"""
+
+
+STATISTICS_RESET_DISPLAY = """
+All statistics has been reset
+"""
