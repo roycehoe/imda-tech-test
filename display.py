@@ -84,6 +84,9 @@ class WashingMachineState:
     def topup_balance(self, money: float):
         self.balance += money
 
+    def reset_balance(self, money: float):
+        self.balance -= money
+
     def __str__(self):
         return f"""
 Current balance: ${self.balance:.2f}"""
