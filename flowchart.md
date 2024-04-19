@@ -1,36 +1,61 @@
-```mermaid
+```Mermaid
 flowchart TD
-    A(Start) --> B{Use Machine?}
-    B -->|No| End(End)
-    B -->|Yes| C(Machine Menu)
+    start([Start Menu]) --> use[Use Machine]
+    start --> maint[Maintenance]
+    start --> exit[Exit]
 
-    C -->|Insert Coin Menu| E{Insert Coins}
-    C -->|Select Wash Menu| SW{Select Wash Type}
-    E -->|Insert 10c, 20c, 50c| E
-    E -->|Go Back| C
+    maint --> maintMenu[Maintenance Menu]
+    maintMenu --> viewStats[View Statistics]
+    maintMenu --> resetStats[Reset Statistics]
+    maintMenu --> goBackMaint[Go Back]
+    goBackMaint --> start
 
-    SW -->|Quick Wash: 10 mins - $2| D
-    SW -->|Mild Wash:30 mins - $2.50| D
-    SW -->|Medium Wash: 45 mins - $4.20| D
-    SW -->|Heavy Wash: 1 hour - $6| D
+    use --> useMenu[Use Machine Menu]
+    useMenu --> insert[Insert Coins]
+    useMenu --> selectWash[Select Wash]
+    useMenu --> goBackUse[Go Back]
+    goBackUse --> start
 
-    D{Balance Enough?}
-    D -->|Too Little| F[Inform Insufficient Funds]
-    F --> C
-    D -->|Too Much| G[Refund Excess]
-    G --> H[Execute Wash]
-    D -->|Just Enough| H[Lock Door and Start Wash]
+    insert --> insertMenu[Insert Coins Menu]
+    insertMenu --> ins10[Insert 10c]
+    insertMenu --> ins20[Insert 20c]
+    insertMenu --> ins50[Insert 50c]
+    insertMenu --> ins1[Insert $1]
+    insertMenu --> goBackIns[Go Back]
+    goBackIns --> useMenu
 
-    H --> I[Display Progress by Percentage and Time]
-    I --> J{Wash Complete?}
-    J -->|Yes| K[Unlock Door and End Wash]
-    J -->|No| I
+    ins10 --> insertMenu
+    ins20 --> insertMenu
+    ins50 --> insertMenu
+    ins1 --> insertMenu
 
-    K --> L{Post-Wash Options}
-    L -->|Display Statistics| M[Display Statistics: Total Time, Money Earned]
-    L -->|Reset Statistics| N[Reset Statistics]
-    L -->|Use Machine Again| C
-    M --> L
-    N --> L
-    L --> End(End)
+    selectWash --> washMenu[Select Wash Menu]
+    washMenu --> quickWash[Quick Wash]
+    washMenu --> mildWash[Mild Wash]
+    washMenu --> mediumWash[Medium Wash]
+    washMenu --> heavyWash[Heavy Wash]
+    washMenu --> goBackWash[Go Back]
+    goBackWash --> useMenu
+
+    quickWash --> process{Process Wash}
+    mildWash --> process
+    mediumWash --> process
+    heavyWash --> process
+
+    process --> sufficient{Sufficient Funds?}
+    sufficient --> |No| prompt[Prompt Insufficient Funds]
+    sufficient --> |Yes| refund[Refund Excess]
+    prompt --> washMenu
+    refund --> startWash[Start Washing]
+
+    startWash --> lock[Lock Door & Start Wash]
+    lock --> progress[Show Progress]
+    progress --> completion[Complete Wash]
+    completion --> unlock[Unlock Door]
+    unlock --> start
+
+
+
+    viewStats --> maintMenu
+    resetStats --> maintMenu
 ```
