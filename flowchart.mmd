@@ -1,0 +1,24 @@
+flowchart TD
+    A[Start] --> B{Use Machine?}
+    B -->|No| Q[End]
+    B -->|Yes| C[Insert Coins]
+    C --> D{Refund?}
+    D -->|No| E[Select Wash Type]
+    D -->|Yes| F[Refund and Cancel]
+    F --> A
+    E --> G{Confirm Selection}
+    G -->|Cancel| F
+    G -->|Proceed| H{Check Excess Money}
+    H -->|Excess| I[Refund Excess]
+    H -->|No Excess| J[Lock Door and Start Wash]
+    I --> J
+    J --> K[Display Progress]
+    K --> L{Wash Complete?}
+    L -->|Yes| M[Unlock Door and End Wash]
+    L -->|No| K
+    M --> N[Maintenance Options]
+    N --> O[Reset Statistics]
+    N --> P[Display Statistics]
+    O --> Q[End]
+    P --> Q[End]
+ --> P[End]
