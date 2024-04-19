@@ -22,6 +22,13 @@ from display import (
 
 DEFAULT_WALLET_BALANCE = 0.00
 
+WASHING_TYPES = {
+    "Quick Wash": {"time": 10, "price": 2.00},
+    "Mild Wash": {"time": 30, "price": 2.5},
+    "Medium Wash": {"time": 45, "price": 4.20},
+    "Heavy Wash": {"time": 60, "price": 6.00},
+}
+
 
 @dataclass
 class WashPrices:
@@ -210,20 +217,85 @@ def get_select_wash_outcome(balance: float, wash_price: float) -> SelectWashOutc
     return SelectWashOutcome.BALANCE_LESS_THAN_WASH_PRICE
 
 
-def get_wash_price(
-    selected_wash: SelectWashMenuSelection, wash_prices: WashPrices = WashPrices()
-) -> float:
+def get_wash_price(selected_wash: SelectWashMenuSelection) -> float:
     if selected_wash == SelectWashMenuSelection.QUICK_WASH:
-        return wash_prices.QUICK
+        return WASHING_TYPES["Quick Wash"]["price"]
     if selected_wash == SelectWashMenuSelection.MILD_WASH:
-        return wash_prices.MILD
+        return WASHING_TYPES["Mild Wash"]["price"]
     if selected_wash == SelectWashMenuSelection.MEDIUM_WASH:
-        return wash_prices.MEDIUM
-    return wash_prices.HEAVY
+        return WASHING_TYPES["Medium Wash"]["price"]
+    return WASHING_TYPES["Heavy Wash"]["price"]
+
+
+def get_wash_time(selected_wash: SelectWashMenuSelection) -> int:
+    if selected_wash == SelectWashMenuSelection.QUICK_WASH:
+        return WASHING_TYPES["Quick Wash"]["time"]
+    if selected_wash == SelectWashMenuSelection.MILD_WASH:
+        return WASHING_TYPES["Mild Wash"]["time"]
+    if selected_wash == SelectWashMenuSelection.MEDIUM_WASH:
+        return WASHING_TYPES["Medium Wash"]["time"]
+    return WASHING_TYPES["Heavy Wash"]["time"]
 
 
 def get_refund_amount(balance: float, wash_price: float) -> float:
     return balance - wash_price
+
+
+def handle_maintenance_menu(
+    washing_machine_statistics: WashingMachineStatistics,
+) -> None:
+    while True:
+        maintenance_menu_input = get_maintenance_menu_input()
+        if maintenance_menu_input == MaintenanceMenuSelection.DISPLAY_STATISTICS:
+            show_statistics(washing_machine_statistics)
+        if maintenance_menu_input == MaintenanceMenuSelection.RESET_STATISTICS:
+            washing_machine_statistics.reset()
+            print(STATISTICS_RESET_DISPLAY)
+        if maintenance_menu_input == MaintenanceMenuSelection.GO_BACK:
+            break
+
+
+def handle_insert_coins_menu(washing_machine_state: WashingMachineState) -> None:
+    while True:
+        insert_coin_input = get_insert_coin_input()
+        if insert_coin_input == InsertCoinMenuSelection.GO_BACK:
+            break
+        topup_washing_machine(washing_machine_state, insert_coin_input)
+        print(washing_machine_state)
+
+
+def handle_select_wash_menu(
+    washing_machine_state: WashingMachineState,
+    washing_machine_statistics: WashingMachineStatistics,
+) -> None:
+    while True:
+        select_wash_input = get_select_wash_input()
+        if select_wash_input == SelectWashMenuSelection.GO_BACK:
+            break
+
+        wash_price = get_wash_price(select_wash_input)
+        select_wash_outcome = get_select_wash_outcome(
+            washing_machine_state.balance, wash_price
+        )
+        if select_wash_outcome == SelectWashOutcome.BALANCE_LESS_THAN_WASH_PRICE:
+            print(INSUFFICIENT_FUNDS_DISPLAY)
+        if select_wash_outcome == SelectWashOutcome.BALANCE_EQUALS_TO_WASH_PRICE:
+            washing_machine_state.reset_balance(wash_price)
+            wash_time = get_wash_time(select_wash_input)
+            print(START_WASH_DISPLAY)
+            print(END_WASH_DISPLAY)
+            break
+        if select_wash_outcome == SelectWashOutcome.BALANCE_MORE_THAN_WASH_PRICE:
+            refund_amount = get_refund_amount(washing_machine_state.balance, wash_price)
+            show_refund_excess_message(refund_amount)
+
+            washing_machine_state.reset_balance(wash_price)
+            wash_time = get_wash_time(select_wash_input)
+            washing_machine_statistics.add_money_earned(wash_price)
+            washing_machine_statistics.add_total_time_switched_on_minutes(wash_time)
+            print(START_WASH_DISPLAY)
+            print(END_WASH_DISPLAY)
+            break
 
 
 washing_machine_statistics = WashingMachineStatistics()
@@ -236,62 +308,18 @@ while True:
         exit()
 
     if start_menu_input == StartMenuSelection.GO_TO_MANTENANCE_MENU:
-        while True:
-            maintenance_menu_input = get_maintenance_menu_input()
-            if maintenance_menu_input == MaintenanceMenuSelection.DISPLAY_STATISTICS:
-                show_statistics(washing_machine_statistics)
-            if maintenance_menu_input == MaintenanceMenuSelection.RESET_STATISTICS:
-                washing_machine_statistics.reset()
-                print(STATISTICS_RESET_DISPLAY)
-            if maintenance_menu_input == MaintenanceMenuSelection.GO_BACK:
-                break
+        handle_maintenance_menu(washing_machine_statistics)
 
     if start_menu_input == StartMenuSelection.GO_TO_USE_MACHINE_MENU:
         while True:
             machine_menu_input = get_machine_menu_input()
             if machine_menu_input == MachineMenuSelection.INSERT_COINS:
-                while True:
-                    insert_coin_input = get_insert_coin_input()
-                    if insert_coin_input == InsertCoinMenuSelection.GO_BACK:
-                        break
-                    topup_washing_machine(washing_machine_state, insert_coin_input)
-                    print(washing_machine_state)
+                handle_insert_coins_menu(washing_machine_state)
 
             if machine_menu_input == MachineMenuSelection.SELECT_WASH:
-                while True:
-                    select_wash_selection = get_select_wash_input()
-                    if select_wash_selection == SelectWashMenuSelection.GO_BACK:
-                        break
-
-                    wash_price = get_wash_price(select_wash_selection)
-                    select_wash_outcome = get_select_wash_outcome(
-                        washing_machine_state.balance, wash_price
-                    )
-                    if (
-                        select_wash_outcome
-                        == SelectWashOutcome.BALANCE_LESS_THAN_WASH_PRICE
-                    ):
-                        print(INSUFFICIENT_FUNDS_DISPLAY)
-                    if (
-                        select_wash_outcome
-                        == SelectWashOutcome.BALANCE_EQUALS_TO_WASH_PRICE
-                    ):
-                        washing_machine_state.reset_balance(wash_price)
-                        print(START_WASH_DISPLAY)
-                        print(END_WASH_DISPLAY)
-                        break
-                    if (
-                        select_wash_outcome
-                        == SelectWashOutcome.BALANCE_MORE_THAN_WASH_PRICE
-                    ):
-                        refund_amount = get_refund_amount(
-                            washing_machine_state.balance, wash_price
-                        )
-                        washing_machine_state.reset_balance(wash_price)
-                        show_refund_excess_message(refund_amount)
-                        print(START_WASH_DISPLAY)
-                        print(END_WASH_DISPLAY)
-                        break
+                handle_select_wash_menu(
+                    washing_machine_state, washing_machine_statistics
+                )
 
             if machine_menu_input == MachineMenuSelection.GO_BACK:
                 break

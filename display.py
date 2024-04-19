@@ -73,7 +73,7 @@ You have selected an invalid option. Please try again
 """
 
 
-DEFAULT_TOTAL_TIME_SWITCHED_ON_HOURS = 0
+DEFAULT_TOTAL_TIME_SWITCHED_ON_MINUTES = 0
 DEFAULT_MONEY_EARNED = 0.00
 
 
@@ -94,16 +94,22 @@ Current balance: ${self.balance:.2f}"""
 
 @dataclass
 class WashingMachineStatistics:
-    total_time_switched_on_hours: int = DEFAULT_TOTAL_TIME_SWITCHED_ON_HOURS
+    total_time_switched_on_minutes: int = DEFAULT_TOTAL_TIME_SWITCHED_ON_MINUTES
     money_earned: float = DEFAULT_MONEY_EARNED
 
     def reset(self):
-        self.total_time_switched_on_hours = DEFAULT_TOTAL_TIME_SWITCHED_ON_HOURS
+        self.total_time_switched_on_minutes = DEFAULT_TOTAL_TIME_SWITCHED_ON_MINUTES
         self.money_earned = DEFAULT_MONEY_EARNED
+
+    def add_total_time_switched_on_minutes(self, additional_time: int):
+        self.total_time_switched_on_minutes += additional_time
+
+    def add_money_earned(self, additional_money_earned: float):
+        self.money_earned += additional_money_earned
 
     def __str__(self):
         return f"""
-Total time switched on: {self.total_time_switched_on_hours} hours
+Total time switched on: {self.total_time_switched_on_minutes} hours
 Balance: ${self.money_earned:.2f}"""
 
 
