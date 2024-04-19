@@ -3,6 +3,7 @@ from enum import Enum, auto
 
 from display import (
     EXIT_DISPLAY,
+    INSERT_COIN_MENU_DISPLAY,
     INVALID_SELECTION_DISPLAY,
     MACHINE_MENU_DISPLAY,
     MAINTENANCE_MENU,
@@ -33,7 +34,7 @@ class MachineMenuSelection(Enum):
     GO_BACK = auto()
 
 
-class InsertCoinsMenuSelection(Enum):
+class InsertCoinMenuSelection(Enum):
     INSERT_TEN_CENTS = auto()
     INSERT_TWENTY_CENTS = auto()
     INSERT_FIFTY_CENTS = auto()
@@ -118,6 +119,45 @@ def get_machine_menu_input() -> MachineMenuSelection:
             print(INVALID_SELECTION_DISPLAY)
 
 
+def get_insert_coin_selection() -> InsertCoinMenuSelection:
+    insert_coin_selection = input(PROMPT_INPUT)
+    if insert_coin_selection == "1":
+        return InsertCoinMenuSelection.INSERT_TEN_CENTS
+    if insert_coin_selection == "2":
+        return InsertCoinMenuSelection.INSERT_TWENTY_CENTS
+    if insert_coin_selection == "3":
+        return InsertCoinMenuSelection.INSERT_FIFTY_CENTS
+    if insert_coin_selection == "4":
+        return InsertCoinMenuSelection.INSERT_ONE_DOLLAR
+    if insert_coin_selection == "0":
+        return InsertCoinMenuSelection.GO_BACK
+    raise InvalidMenuSelectionError
+
+
+def get_insert_coin_input() -> InsertCoinMenuSelection:
+    while True:
+        try:
+            print(INSERT_COIN_MENU_DISPLAY)
+            insert_coin_selection = get_insert_coin_selection()
+            return insert_coin_selection
+        except InvalidMenuSelectionError:
+            print(INVALID_SELECTION_DISPLAY)
+
+
+def topup_washing_machine(
+    washing_machine_state: WashingMachineState,
+    insert_coin_input: InsertCoinMenuSelection,
+) -> None:
+    if insert_coin_input == InsertCoinMenuSelection.INSERT_TEN_CENTS:
+        return washing_machine_state.topup_balance(0.1)
+    if insert_coin_input == InsertCoinMenuSelection.INSERT_TWENTY_CENTS:
+        return washing_machine_state.topup_balance(0.2)
+    if insert_coin_input == InsertCoinMenuSelection.INSERT_FIFTY_CENTS:
+        return washing_machine_state.topup_balance(0.5)
+    if insert_coin_input == InsertCoinMenuSelection.INSERT_ONE_DOLLAR:
+        return washing_machine_state.topup_balance(1.0)
+
+
 washing_machine_statistics = WashingMachineStatistics()
 washing_machine_state = WashingMachineState()
 
@@ -142,7 +182,13 @@ while True:
         while True:
             machine_menu_input = get_machine_menu_input()
             if machine_menu_input == MachineMenuSelection.INSERT_COINS:
-                ...
+                while True:
+                    insert_coin_input = get_insert_coin_input()
+                    if insert_coin_input == InsertCoinMenuSelection.GO_BACK:
+                        break
+                    topup_washing_machine(washing_machine_state, insert_coin_input)
+                    print(washing_machine_state)
+
             if machine_menu_input == MachineMenuSelection.SELECT_WASH:
                 ...
             if machine_menu_input == MachineMenuSelection.GO_BACK:

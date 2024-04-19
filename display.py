@@ -23,7 +23,7 @@ Please select one of the following options:
 
 Otherwise, press [0] to go back"""
 
-INSERT_COINS_MENU_DISPLAY = """
+INSERT_COIN_MENU_DISPLAY = """
 Please choose one of the following coins to insert:
 
 [1] 10c
@@ -31,7 +31,7 @@ Please choose one of the following coins to insert:
 [3] 50c
 [4] $1
 
-Otherwise, press [5] to go back"""
+Otherwise, press [0] to go back"""
 
 SELECT_WASH_MENU_DISPLAY = """
 Please select one of the following washes:
@@ -76,12 +76,17 @@ You have selected an invalid option. Please try again
 DEFAULT_TOTAL_TIME_SWITCHED_ON_HOURS = 0
 DEFAULT_MONEY_EARNED = 0.00
 
+
 @dataclass
 class WashingMachineState:
     balance: float = 0.00
 
     def topup_balance(self, money: float):
         self.balance += money
+
+    def __str__(self):
+        return f"""
+Current balance: ${self.balance:.2f}"""
 
 
 @dataclass
