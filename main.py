@@ -20,7 +20,7 @@ from display import (
     INSUFFICIENT_FUNDS_DISPLAY,
     INVALID_SELECTION_DISPLAY,
     MACHINE_MENU_DISPLAY,
-    MAINTENANCE_MENU,
+    MAINTENANCE_MENU_DISPLAY,
     PROMPT_INPUT,
     SELECT_WASH_MENU_DISPLAY,
     START_MENU_DISPLAY,
@@ -75,7 +75,9 @@ def get_user_menu_input(
 def topup_washing_machine(
     washing_machine_state: WashingMachineBalance,
     insert_coin_input: InsertCoinOptions,
-    coin_value_mapping=INSERT_COIN_OPTIONS_TO_COIN_VALUE_MAPPING,
+    coin_value_mapping: dict[
+        InsertCoinOptions, float
+    ] = INSERT_COIN_OPTIONS_TO_COIN_VALUE_MAPPING,
 ) -> None:
     if coin_value := coin_value_mapping.get(insert_coin_input):
         return washing_machine_state.topup_balance(coin_value)
@@ -114,7 +116,7 @@ def get_refund_amount(balance: float, wash_price: float) -> float:
     return balance - wash_price
 
 
-def show_mock_continuous_washing_job_progress(wash_time: int) -> None:
+def simulate_washing_progress(wash_time: int) -> None:
     for time_left in range(1, wash_time + 1):
         time.sleep(0.1)
         show_washing_job_progress(time_left / wash_time, wash_time - time_left)
@@ -166,6 +168,8 @@ class SelectWashMenuState(State):
 
             self._handle_payment(washing_machine, select_wash_outcome, wash_price)
             self._handle_wash_clothes(washing_machine, wash_time)
+            washing_machine.change_state(StartMenuState())
+            break
 
     def _handle_payment(
         self,
@@ -190,10 +194,8 @@ class SelectWashMenuState(State):
         washing_machine.statistics.add_total_time_switched_on_minutes(wash_time)
 
         print(START_WASH_DISPLAY)
-        show_mock_continuous_washing_job_progress(wash_time)
+        simulate_washing_progress(wash_time)
         print(END_WASH_DISPLAY)
-
-        washing_machine.change_state(StartMenuState())
 
 
 class InsertCoinMenuState(State):
@@ -229,7 +231,7 @@ class MaintenanceMenuState(State):
     def handle_input(self, washing_machine: WashingMachine):
         while True:
             maintenance_menu_input = get_user_menu_input(
-                MAINTENANCE_MENU, USER_INPUT_TO_MAINTENANCE_OPTIONS_MAPPING
+                MAINTENANCE_MENU_DISPLAY, USER_INPUT_TO_MAINTENANCE_OPTIONS_MAPPING
             )
             if maintenance_menu_input == MaintenanceOptions.DISPLAY_STATISTICS:
                 show_statistics(washing_machine.statistics)

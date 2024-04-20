@@ -21,13 +21,6 @@ class InsertCoinOptions(Enum):
     GO_BACK = auto()
 
 
-class WashingTypes(Enum):
-    QUICK_WASH = auto()
-    MILD_WASH = auto()
-    MEDIUM_WASH = auto()
-    HEAVY_WASH = auto()
-
-
 class SelectWashOptions(Enum):
     QUICK_WASH = auto()
     MILD_WASH = auto()
@@ -40,6 +33,13 @@ class MaintenanceOptions(Enum):
     DISPLAY_STATISTICS = auto()
     RESET_STATISTICS = auto()
     GO_BACK = auto()
+
+
+class WashingTypes(Enum):
+    QUICK_WASH = auto()
+    MILD_WASH = auto()
+    MEDIUM_WASH = auto()
+    HEAVY_WASH = auto()
 
 
 class SelectWashOutcome(Enum):

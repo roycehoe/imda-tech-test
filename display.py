@@ -2,8 +2,12 @@ from dataclasses import dataclass
 
 PROMPT_INPUT = "Input: "
 START_MENU_DISPLAY = """
--------------------------------------
++++++++++++++++++++++++++++++++++++++
 Impossibly Mighty Detergent Activator
++++++++++++++++++++++++++++++++++++++
+
+-------------------------------------
+--------------Welcome----------------
 -------------------------------------
 
 Hello there! Thanks for choosing IMDA for your washing needs.
@@ -16,6 +20,10 @@ How may we assist you today?
 
 EXIT_DISPLAY = """Goodbye"""
 MACHINE_MENU_DISPLAY = """
+-------------------------------------
+------------Start Menu---------------
+-------------------------------------
+
 Please select one of the following options:
 
 [1] Insert coins
@@ -24,6 +32,10 @@ Please select one of the following options:
 Otherwise, press [0] to go back"""
 
 INSERT_COIN_MENU_DISPLAY = """
+-------------------------------------
+------------Insert Coins-------------
+-------------------------------------
+
 Please choose one of the following coins to insert:
 
 [1] 10c
@@ -34,6 +46,10 @@ Please choose one of the following coins to insert:
 Otherwise, press [0] to go back"""
 
 SELECT_WASH_MENU_DISPLAY = """
+-------------------------------------
+------------Select Wash--------------
+-------------------------------------
+
 Please select one of the following washes:
 
 [1] Quick Wash: 10 mins - $2.00
@@ -48,15 +64,24 @@ INSUFFICIENT_FUNDS_DISPLAY = """Sorry, it seems you have insufficient funds to d
 Please select a cheaper wash. Otherwise, try topping up your wallet"""
 
 START_WASH_DISPLAY = """
-Door locked. Wash starting...
+=============Door Locked=============
+===========Start of wash=============
 """
 
 END_WASH_DISPLAY = """
-Wash finished! The door is now unlocked. Please don't forget to take your clothes!
+============Door Unlocked============
+============End of wash==============
+
+Wash finished! The door is now unlocked. 
+Please don't forget to take your clothes!
 """
 
-MAINTENANCE_MENU = """
-(Admin) What would you like to do?
+MAINTENANCE_MENU_DISPLAY = """
+-------------------------------------
+------------Maintenance--------------
+-------------------------------------
+
+What would you like to do?
 
 [1] Display statistics
 [2] Reset statistics
@@ -65,7 +90,8 @@ Otherwise, press [0] to go back"""
 
 
 STATISTICS_RESET_DISPLAY = """
-All statistics has been reset
+========Resetting Statistics=========
+======Statistics Reset Complete======
 """
 
 INVALID_SELECTION_DISPLAY = """
@@ -88,8 +114,9 @@ class WashingMachineBalance:
         self.balance -= money
 
     def __str__(self):
-        return f"""
-Current balance: ${self.balance:.2f}"""
+        return f"""------------------------------------
+Current balance: ${self.balance:.2f}
+------------------------------------"""
 
 
 @dataclass
@@ -109,12 +136,12 @@ class WashingMachineStatistics:
 
     def __str__(self):
         return f"""
+========Getting Statistics===========
+
+------------------------------------------------------------------------
 Total time switched on: {self.total_time_switched_on_minutes} minutes 
-Balance: ${self.money_earned:.2f}"""
-
-
-def show_wallet_balance(balance: float) -> None:
-    print(f"Current balance: ${balance}")
+Balance: ${self.money_earned:.2f}
+------------------------------------------------------------------------"""
 
 
 def show_statistics(machine_statistics: WashingMachineStatistics) -> None:
@@ -122,17 +149,27 @@ def show_statistics(machine_statistics: WashingMachineStatistics) -> None:
 
 
 def show_insert_coin_success_message(coin_value: float) -> None:
-    print(f"Ding! ${coin_value} successfully added to your wallet")
+    print(
+        f"""
+========Topping up balance===========
+Ding! ${coin_value} successfully added to your balance"""
+    )
 
 
 def show_refund_excess_message(excess_amount: float) -> None:
-    print(f"Clonk clonk. ${excess_amount} refunded")
+    print(
+        f"""
+========Calculating change===========
+Clonk clonk. ${excess_amount} refunded"""
+    )
 
 
 def show_washing_job_progress(
     progress_percentage: float, remaining_time_minutes: int
 ) -> None:
     print(
-        f"""Current progress: {progress_percentage * 100:.0f}%
-Remaining time: {remaining_time_minutes} mins"""
+        f"""....................................
+Current progress: {progress_percentage * 100:.0f}%
+Remaining time: {remaining_time_minutes} mins
+...................................."""
     )
