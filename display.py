@@ -78,7 +78,7 @@ DEFAULT_MONEY_EARNED = 0.00
 
 
 @dataclass
-class WashingMachineState:
+class WashingMachineBalance:
     balance: float = 0.00
 
     def topup_balance(self, money: float):

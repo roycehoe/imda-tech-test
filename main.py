@@ -15,14 +15,20 @@ from display import (
     START_MENU_DISPLAY,
     START_WASH_DISPLAY,
     STATISTICS_RESET_DISPLAY,
-    WashingMachineState,
+    WashingMachineBalance,
     WashingMachineStatistics,
     show_refund_excess_message,
     show_statistics,
     show_washing_job_progress,
 )
-
-DEFAULT_WALLET_BALANCE = 0.00
+from enums import (
+    InsertCoinOptions,
+    MaintenanceOptions,
+    SelectWashOptions,
+    SelectWashOutcome,
+    StartMenuOptions,
+    WashSettingsOptions,
+)
 
 WASHING_TYPES = {
     "Quick Wash": {"time": 10, "price": 2.00},
@@ -34,46 +40,6 @@ WASHING_TYPES = {
 
 class InvalidMenuSelectionError(Exception):
     pass
-
-
-class StartMenuOptions(Enum):
-    WASH_SETTINGS = auto()
-    MANTENANCE = auto()
-    EXIT = auto()
-
-
-class WashSettingsOptions(Enum):
-    INSERT_COINS = auto()
-    SELECT_WASH = auto()
-    GO_BACK = auto()
-
-
-class InsertCoinOptions(Enum):
-    INSERT_TEN_CENTS = auto()
-    INSERT_TWENTY_CENTS = auto()
-    INSERT_FIFTY_CENTS = auto()
-    INSERT_ONE_DOLLAR = auto()
-    GO_BACK = auto()
-
-
-class SelectWashOptions(Enum):
-    QUICK_WASH = auto()
-    MILD_WASH = auto()
-    MEDIUM_WASH = auto()
-    HEAVY_WASH = auto()
-    GO_BACK = auto()
-
-
-class MaintenanceOptions(Enum):
-    DISPLAY_STATISTICS = auto()
-    RESET_STATISTICS = auto()
-    GO_BACK = auto()
-
-
-class SelectWashOutcome(Enum):
-    BALANCE_MORE_THAN_WASH_PRICE = auto()
-    BALANCE_EQUALS_TO_WASH_PRICE = auto()
-    BALANCE_LESS_THAN_WASH_PRICE = auto()
 
 
 def get_start_menu_options(user_selection: str) -> StartMenuOptions:
@@ -190,7 +156,7 @@ def get_select_wash_input() -> SelectWashOptions:
 
 
 def topup_washing_machine(
-    washing_machine_state: WashingMachineState,
+    washing_machine_state: WashingMachineBalance,
     insert_coin_input: InsertCoinOptions,
 ) -> None:
     if insert_coin_input == InsertCoinOptions.INSERT_TEN_CENTS:
@@ -251,11 +217,12 @@ class WashingMachine:
         self,
         state: State,
         statistics: WashingMachineStatistics,
-        machine_state: WashingMachineState,
+        balance: WashingMachineBalance,
     ):
+
         self.state = state
-        self.washing_machine_statistics = statistics
-        self.washing_machine_state = machine_state
+        self.statistics = statistics
+        self.balance = balance
 
     def run(self):
         while self.state is not None:
@@ -272,26 +239,24 @@ class SelectWashMenuState(State):
 
             wash_price = get_wash_price(select_wash_input)
             select_wash_outcome = get_select_wash_outcome(
-                context.washing_machine_state.balance, wash_price
+                context.balance.balance, wash_price
             )
 
             if select_wash_outcome == SelectWashOutcome.BALANCE_LESS_THAN_WASH_PRICE:
                 print(INSUFFICIENT_FUNDS_DISPLAY)
 
             if select_wash_outcome == SelectWashOutcome.BALANCE_MORE_THAN_WASH_PRICE:
-                refund_amount = get_refund_amount(
-                    washing_machine_state.balance, wash_price
-                )
+                refund_amount = get_refund_amount(context.balance.balance, wash_price)
                 show_refund_excess_message(refund_amount)
 
             if (
                 select_wash_outcome == SelectWashOutcome.BALANCE_MORE_THAN_WASH_PRICE
                 or select_wash_outcome == SelectWashOutcome.BALANCE_EQUALS_TO_WASH_PRICE
             ):
-                washing_machine_state.reset_balance(wash_price)
+                context.balance.reset_balance(wash_price)
                 wash_time = get_wash_time(select_wash_input)
-                washing_machine_statistics.add_money_earned(wash_price)
-                washing_machine_statistics.add_total_time_switched_on_minutes(wash_time)
+                context.statistics.add_money_earned(wash_price)
+                context.statistics.add_total_time_switched_on_minutes(wash_time)
                 print(START_WASH_DISPLAY)
                 show_mock_continuous_washing_job_progress(wash_time)
                 print(END_WASH_DISPLAY)
@@ -307,8 +272,8 @@ class InsertCoinMenuState(State):
                 context.state = UseMachineMenuState()
                 break
 
-            topup_washing_machine(context.washing_machine_state, insert_coin_input)
-            print(washing_machine_state)
+            topup_washing_machine(context.balance, insert_coin_input)
+            print(context.balance)
 
 
 class UseMachineMenuState(State):
@@ -329,9 +294,9 @@ class MaintenanceMenuState(State):
         while True:
             maintenance_menu_input = get_maintenance_menu_input()
             if maintenance_menu_input == MaintenanceOptions.DISPLAY_STATISTICS:
-                show_statistics(context.washing_machine_statistics)
+                show_statistics(context.statistics)
             if maintenance_menu_input == MaintenanceOptions.RESET_STATISTICS:
-                context.washing_machine_statistics.reset()
+                context.statistics.reset()
                 print(STATISTICS_RESET_DISPLAY)
             if maintenance_menu_input == MaintenanceOptions.GO_BACK:
                 context.state = StartMenuState()
@@ -352,11 +317,7 @@ class StartMenuState(State):
             context.state = UseMachineMenuState()
 
 
-washing_machine_statistics = WashingMachineStatistics()
-washing_machine_state = WashingMachineState()
-
-initial_state = StartMenuState()
 washing_machine = WashingMachine(
-    initial_state, washing_machine_statistics, washing_machine_state
+    StartMenuState(), WashingMachineStatistics(), WashingMachineBalance()
 )
 washing_machine.run()
