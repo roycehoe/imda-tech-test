@@ -29,25 +29,25 @@ from enums import (
     WashSettingsOptions,
 )
 
-START_MENU_MAPPING = {
+USER_INPUT_TO_START_OPTIONS_MAPPING = {
     "1": StartMenuOptions.WASH_SETTINGS,
     "2": StartMenuOptions.MANTENANCE,
     "3": StartMenuOptions.EXIT,
 }
 
-MAINTENANCE_MENU_MAPPING = {
+USER_INPUT_TO_MAINTENANCE_OPTIONS_MAPPING = {
     "1": MaintenanceOptions.DISPLAY_STATISTICS,
     "2": MaintenanceOptions.RESET_STATISTICS,
     "0": MaintenanceOptions.GO_BACK,
 }
 
-WASH_SETTINGS_MENU_MAPPING = {
+USER_INPUT_TO_WASH_SETTINGS_OPTIONS_MAPPING = {
     "1": WashSettingsOptions.INSERT_COINS,
     "2": WashSettingsOptions.SELECT_WASH,
     "3": WashSettingsOptions.GO_BACK,
 }
 
-INSERT_COIN_MENU_MAPPING = {
+USER_INPUT_TO_INSERT_COIN_OPTIONS_MAPPING = {
     "1": InsertCoinOptions.INSERT_TEN_CENTS,
     "2": InsertCoinOptions.INSERT_TWENTY_CENTS,
     "3": InsertCoinOptions.INSERT_FIFTY_CENTS,
@@ -55,7 +55,7 @@ INSERT_COIN_MENU_MAPPING = {
     "0": InsertCoinOptions.GO_BACK,
 }
 
-SELECT_WASH_MENU_MAPPING = {
+USER_INPUT_TO_SELECT_WASH_OPTIONS_MAPPING = {
     "1": SelectWashOptions.QUICK_WASH,
     "2": SelectWashOptions.MILD_WASH,
     "3": SelectWashOptions.MEDIUM_WASH,
@@ -63,16 +63,28 @@ SELECT_WASH_MENU_MAPPING = {
     "0": SelectWashOptions.GO_BACK,
 }
 
+INSERT_COIN_OPTIONS_TO_COIN_VALUE_MAPPING = {
+    InsertCoinOptions.INSERT_TEN_CENTS: 0.10,
+    InsertCoinOptions.INSERT_TWENTY_CENTS: 0.20,
+    InsertCoinOptions.INSERT_FIFTY_CENTS: 0.50,
+    InsertCoinOptions.INSERT_ONE_DOLLAR: 1.00,
+}
 
 class InvalidMenuSelectionError(Exception):
     pass
 
 
+class InvalidCoinValueError(Exception):
+    pass
+
+
 def get_start_menu_options(
     user_selection: str,
-    start_menu_mapping: dict[str, StartMenuOptions] = START_MENU_MAPPING,
+    user_input_mapping: dict[
+        str, StartMenuOptions
+    ] = USER_INPUT_TO_START_OPTIONS_MAPPING,
 ) -> StartMenuOptions:
-    if user_selected_option := start_menu_mapping.get(user_selection):
+    if user_selected_option := user_input_mapping.get(user_selection):
         return user_selected_option
     raise InvalidMenuSelectionError
 
@@ -89,9 +101,9 @@ def get_start_menu_input() -> StartMenuOptions:
 
 
 def get_maintenance_menu_options(
-    user_selection: str, maintenance_menu_mapping=MAINTENANCE_MENU_MAPPING
+    user_selection: str, user_input_mapping=USER_INPUT_TO_MAINTENANCE_OPTIONS_MAPPING
 ) -> MaintenanceOptions:
-    if user_selected_option := maintenance_menu_mapping.get(user_selection):
+    if user_selected_option := user_input_mapping.get(user_selection):
         return user_selected_option
     raise InvalidMenuSelectionError
 
@@ -108,9 +120,9 @@ def get_maintenance_menu_input() -> MaintenanceOptions:
 
 
 def get_wash_settings_options(
-    user_selection: str, wash_settings_menu_mapping=WASH_SETTINGS_MENU_MAPPING
+    user_selection: str, user_input_mapping=USER_INPUT_TO_WASH_SETTINGS_OPTIONS_MAPPING
 ) -> WashSettingsOptions:
-    if user_selected_option := wash_settings_menu_mapping.get(user_selection):
+    if user_selected_option := user_input_mapping.get(user_selection):
         return user_selected_option
     raise InvalidMenuSelectionError
 
@@ -127,9 +139,9 @@ def get_wash_settings_input() -> WashSettingsOptions:
 
 
 def get_insert_coin_options(
-    user_selection: str, insert_coin_menu_mapping=INSERT_COIN_MENU_MAPPING
+    user_selection: str, user_input_mapping=USER_INPUT_TO_INSERT_COIN_OPTIONS_MAPPING
 ) -> InsertCoinOptions:
-    if user_selected_option := insert_coin_menu_mapping.get(user_selection):
+    if user_selected_option := user_input_mapping.get(user_selection):
         return user_selected_option
     raise InvalidMenuSelectionError
 
@@ -146,9 +158,9 @@ def get_insert_coin_input() -> InsertCoinOptions:
 
 
 def get_select_wash_options(
-    user_selection: str, select_wash_menu_mapping=SELECT_WASH_MENU_MAPPING
+    user_selection: str, user_input_mapping=USER_INPUT_TO_SELECT_WASH_OPTIONS_MAPPING
 ) -> SelectWashOptions:
-    if user_selected_option := select_wash_menu_mapping.get(user_selection):
+    if user_selected_option := user_input_mapping.get(user_selection):
         return user_selected_option
     raise InvalidMenuSelectionError
 
@@ -167,15 +179,11 @@ def get_select_wash_input() -> SelectWashOptions:
 def topup_washing_machine(
     washing_machine_state: WashingMachineBalance,
     insert_coin_input: InsertCoinOptions,
+    coin_value_mapping=INSERT_COIN_OPTIONS_TO_COIN_VALUE_MAPPING,
 ) -> None:
-    if insert_coin_input == InsertCoinOptions.INSERT_TEN_CENTS:
-        return washing_machine_state.topup_balance(0.1)
-    if insert_coin_input == InsertCoinOptions.INSERT_TWENTY_CENTS:
-        return washing_machine_state.topup_balance(0.2)
-    if insert_coin_input == InsertCoinOptions.INSERT_FIFTY_CENTS:
-        return washing_machine_state.topup_balance(0.5)
-    if insert_coin_input == InsertCoinOptions.INSERT_ONE_DOLLAR:
-        return washing_machine_state.topup_balance(1.0)
+    if coin_value := coin_value_mapping.get(insert_coin_input):
+        return washing_machine_state.topup_balance(coin_value)
+    raise InvalidCoinValueError
 
 
 def get_select_wash_outcome(balance: float, wash_price: float) -> SelectWashOutcome:
