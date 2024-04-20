@@ -1,8 +1,7 @@
 import time
 from abc import ABC
-from dataclasses import dataclass
 from enum import Enum
-from typing import Final, TypeVar
+from typing import TypeVar
 
 from constants import (
     DEFAULT_WASHING_TYPES,
@@ -16,23 +15,22 @@ from constants import (
 from display import (
     END_WASH_DISPLAY,
     EXIT_DISPLAY,
-    INSERT_COIN_MENU_DISPLAY,
     INSUFFICIENT_FUNDS_DISPLAY,
     INVALID_SELECTION_DISPLAY,
-    MAINTENANCE_MENU_DISPLAY,
+    MENU_INSERT_COIN_DISPLAY,
+    MENU_MAINTENANCE_DISPLAY,
+    MENU_START_DISPLAY,
+    MENU_WASH_SETTINGS_DISPLAY,
     PROMPT_INPUT,
-    SELECT_WASH_MENU_DISPLAY,
-    START_MENU_DISPLAY,
     START_WASH_DISPLAY,
     STATISTICS_RESET_DISPLAY,
     TOPUP_SUCCESS_DISPLAY,
-    WASH_SETTINGS_MENU_DISPLAY,
     WashingMachineBalance,
     WashingMachineStatistics,
-    get_select_wash_menu_display,
-    show_refund_excess_message,
-    show_statistics,
-    show_washing_job_progress,
+    get_insert_coin_success_display,
+    get_menu_select_wash_display,
+    get_refund_excess_display,
+    get_washing_job_progress_display,
 )
 from enums import (
     InsertCoinOptions,
@@ -121,7 +119,10 @@ def get_refund_amount(balance: float, wash_price: float) -> float:
 def simulate_washing_progress(wash_time: int) -> None:
     for time_left in range(1, wash_time + 1):
         time.sleep(0.1)
-        show_washing_job_progress(time_left / wash_time, wash_time - time_left)
+        display = get_washing_job_progress_display(
+            time_left / wash_time, wash_time - time_left
+        )
+        print(display)
 
 
 class State(ABC):
@@ -154,7 +155,7 @@ class SelectWashMenuState(State):
         while True:
 
             selected_wash_input = get_user_menu_input(
-                get_select_wash_menu_display(washing_machine.balance.balance),
+                get_menu_select_wash_display(washing_machine.balance.balance),
                 USER_INPUT_TO_SELECT_WASH_OPTIONS_MAPPING,
             )
             if selected_wash_input == SelectWashOptions.GO_BACK:
@@ -185,7 +186,8 @@ class SelectWashMenuState(State):
             refund_amount = get_refund_amount(
                 washing_machine.balance.balance, wash_price
             )
-            show_refund_excess_message(refund_amount)
+            refund_amount_display = get_refund_excess_display(refund_amount)
+            print(refund_amount_display)
 
         washing_machine.balance.reset_balance(wash_price)
         washing_machine.statistics.add_money_earned(wash_price)
@@ -206,12 +208,11 @@ class InsertCoinMenuState(State):
     def handle_input(self, washing_machine: WashingMachine):
         while True:
             insert_coin_input = get_user_menu_input(
-                INSERT_COIN_MENU_DISPLAY, USER_INPUT_TO_INSERT_COIN_OPTIONS_MAPPING
+                MENU_INSERT_COIN_DISPLAY, USER_INPUT_TO_INSERT_COIN_OPTIONS_MAPPING
             )
             if insert_coin_input == InsertCoinOptions.GO_BACK:
                 washing_machine.change_state(WashSettingsMenuState())
                 break
-
             topup_washing_machine(washing_machine.balance, insert_coin_input)
             print(TOPUP_SUCCESS_DISPLAY)
             print(washing_machine.balance)
@@ -220,7 +221,7 @@ class InsertCoinMenuState(State):
 class WashSettingsMenuState(State):
     def handle_input(self, washing_machine: WashingMachine):
         wash_settings_input = get_user_menu_input(
-            WASH_SETTINGS_MENU_DISPLAY, USER_INPUT_TO_WASH_SETTINGS_OPTIONS_MAPPING
+            MENU_WASH_SETTINGS_DISPLAY, USER_INPUT_TO_WASH_SETTINGS_OPTIONS_MAPPING
         )
         if wash_settings_input == WashSettingsOptions.INSERT_COINS:
             washing_machine.change_state(InsertCoinMenuState())
@@ -236,10 +237,10 @@ class MaintenanceMenuState(State):
     def handle_input(self, washing_machine: WashingMachine):
         while True:
             maintenance_menu_input = get_user_menu_input(
-                MAINTENANCE_MENU_DISPLAY, USER_INPUT_TO_MAINTENANCE_OPTIONS_MAPPING
+                MENU_MAINTENANCE_DISPLAY, USER_INPUT_TO_MAINTENANCE_OPTIONS_MAPPING
             )
             if maintenance_menu_input == MaintenanceOptions.DISPLAY_STATISTICS:
-                show_statistics(washing_machine.statistics)
+                print(washing_machine.statistics)
             if maintenance_menu_input == MaintenanceOptions.RESET_STATISTICS:
                 washing_machine.statistics.reset()
                 print(STATISTICS_RESET_DISPLAY)
@@ -251,7 +252,7 @@ class MaintenanceMenuState(State):
 class StartMenuState(State):
     def handle_input(self, washing_machine: WashingMachine):
         start_menu_input = get_user_menu_input(
-            START_MENU_DISPLAY, USER_INPUT_TO_START_OPTIONS_MAPPING
+            MENU_START_DISPLAY, USER_INPUT_TO_START_OPTIONS_MAPPING
         )
         if start_menu_input == StartMenuOptions.EXIT:
             print(EXIT_DISPLAY)

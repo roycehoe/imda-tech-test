@@ -19,12 +19,14 @@ class WashingTypeData:
 @dataclass
 class WashingTypes:
     QUICK_WASH: Final = WashingTypeData(10, 2.00)
-    MILD_WASH: Final = WashingTypeData(10, 2.00)
-    MEDIUM_WASH: Final = WashingTypeData(10, 2.00)
-    HEAVY_WASH: Final = WashingTypeData(10, 2.00)
+    MILD_WASH: Final = WashingTypeData(30, 2.50)
+    MEDIUM_WASH: Final = WashingTypeData(45, 4.20)
+    HEAVY_WASH: Final = WashingTypeData(60, 6.00)
 
 
 DEFAULT_WASHING_TYPES = WashingTypes()
+DEFAULT_TOTAL_TIME_SWITCHED_ON_MINUTES = 0
+DEFAULT_MONEY_EARNED = 0.00
 
 USER_INPUT_TO_START_OPTIONS_MAPPING = {
     "1": StartMenuOptions.WASH_SETTINGS,
