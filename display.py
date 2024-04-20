@@ -109,7 +109,7 @@ class WashingMachineStatistics:
 
     def __str__(self):
         return f"""
-Total time switched on: {self.total_time_switched_on_minutes} hours
+Total time switched on: {self.total_time_switched_on_minutes} minutes 
 Balance: ${self.money_earned:.2f}"""
 
 
