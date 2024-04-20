@@ -1,12 +1,14 @@
 import time
 from abc import ABC
 from dataclasses import dataclass
-from typing import Final
+from enum import Enum
+from typing import Final, TypeVar
 
 from constants import (
     DEFAULT_WASHING_TYPES,
     INSERT_COIN_OPTIONS_TO_COIN_VALUE_MAPPING,
     USER_INPUT_TO_INSERT_COIN_OPTIONS_MAPPING,
+    USER_INPUT_TO_MAINTENANCE_OPTIONS_MAPPING,
     USER_INPUT_TO_SELECT_WASH_OPTIONS_MAPPING,
     USER_INPUT_TO_START_OPTIONS_MAPPING,
     USER_INPUT_TO_WASH_SETTINGS_OPTIONS_MAPPING,
@@ -39,6 +41,8 @@ from enums import (
     WashSettingsOptions,
 )
 
+T = TypeVar("T", bound=Enum)
+
 
 class InvalidMenuSelectionError(Exception):
     pass
@@ -48,100 +52,22 @@ class InvalidCoinValueError(Exception):
     pass
 
 
-def get_start_menu_options(
-    user_selection: str,
-    user_input_mapping: dict[
-        str, StartMenuOptions
-    ] = USER_INPUT_TO_START_OPTIONS_MAPPING,
-) -> StartMenuOptions:
-    if user_selected_option := user_input_mapping.get(user_selection):
-        return user_selected_option
+def get_menu_option(option_str: str, options_mapping: dict[str, T]) -> T:
+    if selected_option := options_mapping.get(option_str):
+        return selected_option
     raise InvalidMenuSelectionError
 
 
-def get_start_menu_input() -> StartMenuOptions:
+def get_user_menu_input(
+    display_message: str,
+    options_mapping: dict[str, T],
+    prompt_message: str = PROMPT_INPUT,
+) -> T:
     while True:
         try:
-            print(START_MENU_DISPLAY)
-            user_input = input(PROMPT_INPUT)
-            start_menu_selection = get_start_menu_options(user_input)
-            return start_menu_selection
-        except InvalidMenuSelectionError:
-            print(INVALID_SELECTION_DISPLAY)
-
-
-def get_maintenance_menu_options(
-    user_selection: str, user_input_mapping=USER_INPUT_TO_MAINTENANCE_OPTIONS_MAPPING
-) -> MaintenanceOptions:
-    if user_selected_option := user_input_mapping.get(user_selection):
-        return user_selected_option
-    raise InvalidMenuSelectionError
-
-
-def get_maintenance_menu_input() -> MaintenanceOptions:
-    while True:
-        try:
-            print(MAINTENANCE_MENU)
-            user_selection = input(PROMPT_INPUT)
-            maintenance_menu_selection = get_maintenance_menu_options(user_selection)
-            return maintenance_menu_selection
-        except InvalidMenuSelectionError:
-            print(INVALID_SELECTION_DISPLAY)
-
-
-def get_wash_settings_options(
-    user_selection: str, user_input_mapping=USER_INPUT_TO_WASH_SETTINGS_OPTIONS_MAPPING
-) -> WashSettingsOptions:
-    if user_selected_option := user_input_mapping.get(user_selection):
-        return user_selected_option
-    raise InvalidMenuSelectionError
-
-
-def get_wash_settings_input() -> WashSettingsOptions:
-    while True:
-        try:
-            print(MACHINE_MENU_DISPLAY)
-            user_selection = input(PROMPT_INPUT)
-            machine_menu_selection = get_wash_settings_options(user_selection)
-            return machine_menu_selection
-        except InvalidMenuSelectionError:
-            print(INVALID_SELECTION_DISPLAY)
-
-
-def get_insert_coin_options(
-    user_selection: str, user_input_mapping=USER_INPUT_TO_INSERT_COIN_OPTIONS_MAPPING
-) -> InsertCoinOptions:
-    if user_selected_option := user_input_mapping.get(user_selection):
-        return user_selected_option
-    raise InvalidMenuSelectionError
-
-
-def get_insert_coin_input() -> InsertCoinOptions:
-    while True:
-        try:
-            print(INSERT_COIN_MENU_DISPLAY)
-            user_selection = input(PROMPT_INPUT)
-            insert_coin_selection = get_insert_coin_options(user_selection)
-            return insert_coin_selection
-        except InvalidMenuSelectionError:
-            print(INVALID_SELECTION_DISPLAY)
-
-
-def get_select_wash_options(
-    user_selection: str, user_input_mapping=USER_INPUT_TO_SELECT_WASH_OPTIONS_MAPPING
-) -> SelectWashOptions:
-    if user_selected_option := user_input_mapping.get(user_selection):
-        return user_selected_option
-    raise InvalidMenuSelectionError
-
-
-def get_select_wash_input() -> SelectWashOptions:
-    while True:
-        try:
-            print(SELECT_WASH_MENU_DISPLAY)
-            user_selection = input(PROMPT_INPUT)
-            select_wash_selection = get_select_wash_options(user_selection)
-            return select_wash_selection
+            print(display_message)
+            user_input = input(prompt_message)
+            return get_menu_option(user_input, options_mapping)
         except InvalidMenuSelectionError:
             print(INVALID_SELECTION_DISPLAY)
 
@@ -222,7 +148,9 @@ class WashingMachine:
 class SelectWashMenuState(State):
     def handle_input(self, washing_machine: WashingMachine):
         while True:
-            selected_wash_input = get_select_wash_input()
+            selected_wash_input = get_user_menu_input(
+                SELECT_WASH_MENU_DISPLAY, USER_INPUT_TO_SELECT_WASH_OPTIONS_MAPPING
+            )
             if selected_wash_input == SelectWashOptions.GO_BACK:
                 washing_machine.change_state(WashSettingsMenuState())
                 break
@@ -271,7 +199,9 @@ class SelectWashMenuState(State):
 class InsertCoinMenuState(State):
     def handle_input(self, washing_machine: WashingMachine):
         while True:
-            insert_coin_input = get_insert_coin_input()
+            insert_coin_input = get_user_menu_input(
+                INSERT_COIN_MENU_DISPLAY, USER_INPUT_TO_INSERT_COIN_OPTIONS_MAPPING
+            )
             if insert_coin_input == InsertCoinOptions.GO_BACK:
                 washing_machine.change_state(WashSettingsMenuState())
                 break
@@ -282,21 +212,25 @@ class InsertCoinMenuState(State):
 
 class WashSettingsMenuState(State):
     def handle_input(self, washing_machine: WashingMachine):
-        machine_menu_input = get_wash_settings_input()
-        if machine_menu_input == WashSettingsOptions.INSERT_COINS:
+        wash_settings_input = get_user_menu_input(
+            MACHINE_MENU_DISPLAY, USER_INPUT_TO_WASH_SETTINGS_OPTIONS_MAPPING
+        )
+        if wash_settings_input == WashSettingsOptions.INSERT_COINS:
             washing_machine.change_state(InsertCoinMenuState())
 
-        if machine_menu_input == WashSettingsOptions.SELECT_WASH:
+        if wash_settings_input == WashSettingsOptions.SELECT_WASH:
             washing_machine.change_state(SelectWashMenuState())
 
-        if machine_menu_input == WashSettingsOptions.GO_BACK:
+        if wash_settings_input == WashSettingsOptions.GO_BACK:
             washing_machine.change_state(StartMenuState())
 
 
 class MaintenanceMenuState(State):
     def handle_input(self, washing_machine: WashingMachine):
         while True:
-            maintenance_menu_input = get_maintenance_menu_input()
+            maintenance_menu_input = get_user_menu_input(
+                MAINTENANCE_MENU, USER_INPUT_TO_MAINTENANCE_OPTIONS_MAPPING
+            )
             if maintenance_menu_input == MaintenanceOptions.DISPLAY_STATISTICS:
                 show_statistics(washing_machine.statistics)
             if maintenance_menu_input == MaintenanceOptions.RESET_STATISTICS:
@@ -309,7 +243,9 @@ class MaintenanceMenuState(State):
 
 class StartMenuState(State):
     def handle_input(self, washing_machine: WashingMachine):
-        start_menu_input = get_start_menu_input()
+        start_menu_input = get_user_menu_input(
+            START_MENU_DISPLAY, USER_INPUT_TO_START_OPTIONS_MAPPING
+        )
         if start_menu_input == StartMenuOptions.EXIT:
             print(EXIT_DISPLAY)
             exit()
