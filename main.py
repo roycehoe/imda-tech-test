@@ -19,15 +19,17 @@ from display import (
     INSERT_COIN_MENU_DISPLAY,
     INSUFFICIENT_FUNDS_DISPLAY,
     INVALID_SELECTION_DISPLAY,
-    MACHINE_MENU_DISPLAY,
     MAINTENANCE_MENU_DISPLAY,
     PROMPT_INPUT,
     SELECT_WASH_MENU_DISPLAY,
     START_MENU_DISPLAY,
     START_WASH_DISPLAY,
     STATISTICS_RESET_DISPLAY,
+    TOPUP_SUCCESS_DISPLAY,
+    WASH_SETTINGS_MENU_DISPLAY,
     WashingMachineBalance,
     WashingMachineStatistics,
+    get_select_wash_menu_display,
     show_refund_excess_message,
     show_statistics,
     show_washing_job_progress,
@@ -150,8 +152,10 @@ class WashingMachine:
 class SelectWashMenuState(State):
     def handle_input(self, washing_machine: WashingMachine):
         while True:
+
             selected_wash_input = get_user_menu_input(
-                SELECT_WASH_MENU_DISPLAY, USER_INPUT_TO_SELECT_WASH_OPTIONS_MAPPING
+                get_select_wash_menu_display(washing_machine.balance.balance),
+                USER_INPUT_TO_SELECT_WASH_OPTIONS_MAPPING,
             )
             if selected_wash_input == SelectWashOptions.GO_BACK:
                 washing_machine.change_state(WashSettingsMenuState())
@@ -209,13 +213,14 @@ class InsertCoinMenuState(State):
                 break
 
             topup_washing_machine(washing_machine.balance, insert_coin_input)
+            print(TOPUP_SUCCESS_DISPLAY)
             print(washing_machine.balance)
 
 
 class WashSettingsMenuState(State):
     def handle_input(self, washing_machine: WashingMachine):
         wash_settings_input = get_user_menu_input(
-            MACHINE_MENU_DISPLAY, USER_INPUT_TO_WASH_SETTINGS_OPTIONS_MAPPING
+            WASH_SETTINGS_MENU_DISPLAY, USER_INPUT_TO_WASH_SETTINGS_OPTIONS_MAPPING
         )
         if wash_settings_input == WashSettingsOptions.INSERT_COINS:
             washing_machine.change_state(InsertCoinMenuState())

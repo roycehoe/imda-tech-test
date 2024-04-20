@@ -41,7 +41,7 @@ USER_INPUT_TO_MAINTENANCE_OPTIONS_MAPPING = {
 USER_INPUT_TO_WASH_SETTINGS_OPTIONS_MAPPING = {
     "1": WashSettingsOptions.INSERT_COINS,
     "2": WashSettingsOptions.SELECT_WASH,
-    "3": WashSettingsOptions.GO_BACK,
+    "0": WashSettingsOptions.GO_BACK,
 }
 
 USER_INPUT_TO_INSERT_COIN_OPTIONS_MAPPING = {

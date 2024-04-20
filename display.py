@@ -19,9 +19,9 @@ How may we assist you today?
 """
 
 EXIT_DISPLAY = """Goodbye"""
-MACHINE_MENU_DISPLAY = """
+WASH_SETTINGS_MENU_DISPLAY = """
 -------------------------------------
-------------Start Menu---------------
+-----------Wash Settings-------------
 -------------------------------------
 
 Please select one of the following options:
@@ -65,16 +65,17 @@ Please select a cheaper wash. Otherwise, try topping up your wallet"""
 
 START_WASH_DISPLAY = """
 =============Door Locked=============
-===========Start of wash=============
-"""
+===========Start of wash============="""
+
+TOPUP_SUCCESS_DISPLAY = """
+==========Topup Successful==========="""
 
 END_WASH_DISPLAY = """
 ============Door Unlocked============
 ============End of wash==============
 
 Wash finished! The door is now unlocked. 
-Please don't forget to take your clothes!
-"""
+Please don't forget to take your clothes!"""
 
 MAINTENANCE_MENU_DISPLAY = """
 -------------------------------------
@@ -91,12 +92,11 @@ Otherwise, press [0] to go back"""
 
 STATISTICS_RESET_DISPLAY = """
 ========Resetting Statistics=========
-======Statistics Reset Complete======
-"""
+======Statistics Reset Complete======"""
 
 INVALID_SELECTION_DISPLAY = """
-You have selected an invalid option. Please try again
-"""
+==========Invalid Option=============
+You have selected an invalid option. Please try again."""
 
 
 DEFAULT_TOTAL_TIME_SWITCHED_ON_MINUTES = 0
@@ -114,9 +114,9 @@ class WashingMachineBalance:
         self.balance -= money
 
     def __str__(self):
-        return f"""------------------------------------
+        return f"""-------------------------------------
 Current balance: ${self.balance:.2f}
-------------------------------------"""
+-------------------------------------"""
 
 
 @dataclass
@@ -173,3 +173,23 @@ Current progress: {progress_percentage * 100:.0f}%
 Remaining time: {remaining_time_minutes} mins
 ...................................."""
     )
+
+
+def get_select_wash_menu_display(current_balance: float) -> str:
+    return f"""
+-------------------------------------
+------------Select Wash--------------
+-------------------------------------
+      
+-------------------------------------
+Current balance: {current_balance:.2f}
+-------------------------------------
+
+Please select one of the following washes:
+
+[1] Quick Wash: 10 mins - $2.00
+[2] Mild Wash: 30 mins - $2.50
+[3] Medium Wash: 45 mins - $4.20
+[4] Heavy Wash: 1 hour - $6.00
+
+Otherwise, press [0] to go back"""
