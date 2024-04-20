@@ -1,3 +1,5 @@
+import time
+from abc import ABC
 from dataclasses import dataclass
 from enum import Enum, auto
 
@@ -18,6 +20,7 @@ from display import (
     WashingMachineStatistics,
     show_refund_excess_message,
     show_statistics,
+    show_washing_job_progress,
 )
 
 DEFAULT_WALLET_BALANCE = 0.00
@@ -264,6 +267,12 @@ def handle_insert_coins_menu(washing_machine_state: WashingMachineState) -> None
         print(washing_machine_state)
 
 
+def show_mock_continuous_washing_job_progress(wash_time: int) -> None:
+    for i in range(1, wash_time + 1):
+        time.sleep(0.1)
+        show_washing_job_progress(i / wash_time, wash_time - i)
+
+
 def handle_select_wash_menu(
     washing_machine_state: WashingMachineState,
     washing_machine_statistics: WashingMachineStatistics,
@@ -291,32 +300,80 @@ def handle_select_wash_menu(
             washing_machine_statistics.add_money_earned(wash_price)
             washing_machine_statistics.add_total_time_switched_on_minutes(wash_time)
             print(START_WASH_DISPLAY)
+            show_mock_continuous_washing_job_progress(wash_time)
             print(END_WASH_DISPLAY)
             break
+
+
+class WashingMachine:
+    def __init__(self, state, statistics, machine_state):
+        self.state = state
+        self.washing_machine_statistics = statistics
+        self.washing_machine_state = machine_state
+
+    def run(self):
+        while self.state is not None:
+            self.state.handle_input(self)
+
+
+class State(ABC):
+    def handle_input(self, context):
+        raise NotImplementedError
+
+
+class MaintenanceMenuState(State):
+    def handle_input(self, context: WashingMachine):
+        while True:
+            maintenance_menu_input = get_maintenance_menu_input()
+            if maintenance_menu_input == MaintenanceMenuSelection.DISPLAY_STATISTICS:
+                show_statistics(context.washing_machine_statistics)
+            if maintenance_menu_input == MaintenanceMenuSelection.RESET_STATISTICS:
+                context.washing_machine_statistics.reset()
+                print(STATISTICS_RESET_DISPLAY)
+            if maintenance_menu_input == MaintenanceMenuSelection.GO_BACK:
+                context.state = StartMenuState()
+                break
+
+
+class StartMenuState(State):
+    def handle_input(self, context: WashingMachine):
+        start_menu_input = get_start_menu_input()
+        if start_menu_input == StartMenuSelection.EXIT:
+            print(EXIT_DISPLAY)
+            exit()
+
+        if start_menu_input == StartMenuSelection.GO_TO_MANTENANCE_MENU:
+            context.state = MaintenanceMenuState()
 
 
 washing_machine_statistics = WashingMachineStatistics()
 washing_machine_state = WashingMachineState()
 
-while True:
-    start_menu_input = get_start_menu_input()
-    if start_menu_input == StartMenuSelection.EXIT:
-        print(EXIT_DISPLAY)
-        exit()
+initial_state = StartMenuState()
+washing_machine = WashingMachine(
+    initial_state, washing_machine_statistics, washing_machine_state
+)
+washing_machine.run()
 
-    if start_menu_input == StartMenuSelection.GO_TO_MANTENANCE_MENU:
-        handle_maintenance_menu(washing_machine_statistics)
+# while True:
+#     start_menu_input = get_start_menu_input()
+#     if start_menu_input == StartMenuSelection.EXIT:
+#         print(EXIT_DISPLAY)
+#         exit()
 
-    if start_menu_input == StartMenuSelection.GO_TO_USE_MACHINE_MENU:
-        while True:
-            machine_menu_input = get_machine_menu_input()
-            if machine_menu_input == MachineMenuSelection.INSERT_COINS:
-                handle_insert_coins_menu(washing_machine_state)
+#     if start_menu_input == StartMenuSelection.GO_TO_MANTENANCE_MENU:
+#         handle_maintenance_menu(washing_machine_statistics)
 
-            if machine_menu_input == MachineMenuSelection.SELECT_WASH:
-                handle_select_wash_menu(
-                    washing_machine_state, washing_machine_statistics
-                )
+#     if start_menu_input == StartMenuSelection.GO_TO_USE_MACHINE_MENU:
+#         while True:
+#             machine_menu_input = get_machine_menu_input()
+#             if machine_menu_input == MachineMenuSelection.INSERT_COINS:
+#                 handle_insert_coins_menu(washing_machine_state)
 
-            if machine_menu_input == MachineMenuSelection.GO_BACK:
-                break
+#             if machine_menu_input == MachineMenuSelection.SELECT_WASH:
+#                 handle_select_wash_menu(
+#                     washing_machine_state, washing_machine_statistics
+#                 )
+
+#             if machine_menu_input == MachineMenuSelection.GO_BACK:
+#                 break
