@@ -1,8 +1,8 @@
 ```Mermaid
 flowchart TD
+    start --> exit[Exit]
     start([Start Menu]) --> use[Use Machine]
     start --> maint[Maintenance]
-    start --> exit[Exit]
 
     maint --> maintMenu[Maintenance Menu]
     maintMenu --> viewStats[View Statistics]
@@ -58,4 +58,5 @@ flowchart TD
 
     viewStats --> maintMenu
     resetStats --> maintMenu
+
 ```
