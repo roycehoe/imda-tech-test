@@ -1,8 +1,6 @@
 import time
 from abc import ABC
-from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Any
 
 from display import (
     END_WASH_DISPLAY,
@@ -39,18 +37,18 @@ class InvalidMenuSelectionError(Exception):
 
 
 class StartMenuOptions(Enum):
-    GO_TO_USE_MACHINE_MENU = auto()
-    GO_TO_MANTENANCE_MENU = auto()
+    WASH_SETTINGS = auto()
+    MANTENANCE = auto()
     EXIT = auto()
 
 
-class MachineMenuSelection(Enum):
+class WashSettingsOptions(Enum):
     INSERT_COINS = auto()
     SELECT_WASH = auto()
     GO_BACK = auto()
 
 
-class InsertCoinMenuSelection(Enum):
+class InsertCoinOptions(Enum):
     INSERT_TEN_CENTS = auto()
     INSERT_TWENTY_CENTS = auto()
     INSERT_FIFTY_CENTS = auto()
@@ -58,7 +56,7 @@ class InsertCoinMenuSelection(Enum):
     GO_BACK = auto()
 
 
-class SelectWashMenuSelection(Enum):
+class SelectWashOptions(Enum):
     QUICK_WASH = auto()
     MILD_WASH = auto()
     MEDIUM_WASH = auto()
@@ -66,7 +64,7 @@ class SelectWashMenuSelection(Enum):
     GO_BACK = auto()
 
 
-class MaintenanceMenuSelection(Enum):
+class MaintenanceOptions(Enum):
     DISPLAY_STATISTICS = auto()
     RESET_STATISTICS = auto()
     GO_BACK = auto()
@@ -78,12 +76,11 @@ class SelectWashOutcome(Enum):
     BALANCE_LESS_THAN_WASH_PRICE = auto()
 
 
-
-def get_start_menu_selection(user_selection: str) -> StartMenuOptions:
+def get_start_menu_options(user_selection: str) -> StartMenuOptions:
     if user_selection == "1":
-        return StartMenuOptions.GO_TO_USE_MACHINE_MENU
+        return StartMenuOptions.WASH_SETTINGS
     if user_selection == "2":
-        return StartMenuOptions.GO_TO_MANTENANCE_MENU
+        return StartMenuOptions.MANTENANCE
     if user_selection == "3":
         return StartMenuOptions.EXIT
     raise InvalidMenuSelectionError
@@ -94,99 +91,99 @@ def get_start_menu_input() -> StartMenuOptions:
         try:
             print(START_MENU_DISPLAY)
             user_input = input(PROMPT_INPUT)
-            start_menu_selection = get_start_menu_selection(user_input)
+            start_menu_selection = get_start_menu_options(user_input)
             return start_menu_selection
         except InvalidMenuSelectionError:
             print(INVALID_SELECTION_DISPLAY)
 
 
-def get_maintenance_menu_selection(user_selection: str) -> MaintenanceMenuSelection:
+def get_maintenance_menu_options(user_selection: str) -> MaintenanceOptions:
     if user_selection == "1":
-        return MaintenanceMenuSelection.DISPLAY_STATISTICS
+        return MaintenanceOptions.DISPLAY_STATISTICS
     if user_selection == "2":
-        return MaintenanceMenuSelection.RESET_STATISTICS
+        return MaintenanceOptions.RESET_STATISTICS
     if user_selection == "0":
-        return MaintenanceMenuSelection.GO_BACK
+        return MaintenanceOptions.GO_BACK
     raise InvalidMenuSelectionError
 
 
-def get_maintenance_menu_input() -> MaintenanceMenuSelection:
+def get_maintenance_menu_input() -> MaintenanceOptions:
     while True:
         try:
             print(MAINTENANCE_MENU)
             user_selection = input(PROMPT_INPUT)
-            maintenance_menu_selection = get_maintenance_menu_selection(user_selection)
+            maintenance_menu_selection = get_maintenance_menu_options(user_selection)
             return maintenance_menu_selection
         except InvalidMenuSelectionError:
             print(INVALID_SELECTION_DISPLAY)
 
 
-def get_machine_menu_selection(user_selection: str) -> MachineMenuSelection:
+def get_wash_settings_options(user_selection: str) -> WashSettingsOptions:
     if user_selection == "1":
-        return MachineMenuSelection.INSERT_COINS
+        return WashSettingsOptions.INSERT_COINS
     if user_selection == "2":
-        return MachineMenuSelection.SELECT_WASH
+        return WashSettingsOptions.SELECT_WASH
     if user_selection == "3":
-        return MachineMenuSelection.GO_BACK
+        return WashSettingsOptions.GO_BACK
     raise InvalidMenuSelectionError
 
 
-def get_machine_menu_input() -> MachineMenuSelection:
+def get_wash_settings_input() -> WashSettingsOptions:
     while True:
         try:
             print(MACHINE_MENU_DISPLAY)
             user_selection = input(PROMPT_INPUT)
-            machine_menu_selection = get_machine_menu_selection(user_selection)
+            machine_menu_selection = get_wash_settings_options(user_selection)
             return machine_menu_selection
         except InvalidMenuSelectionError:
             print(INVALID_SELECTION_DISPLAY)
 
 
-def get_insert_coin_selection(user_selection: str) -> InsertCoinMenuSelection:
+def get_insert_coin_options(user_selection: str) -> InsertCoinOptions:
     if user_selection == "1":
-        return InsertCoinMenuSelection.INSERT_TEN_CENTS
+        return InsertCoinOptions.INSERT_TEN_CENTS
     if user_selection == "2":
-        return InsertCoinMenuSelection.INSERT_TWENTY_CENTS
+        return InsertCoinOptions.INSERT_TWENTY_CENTS
     if user_selection == "3":
-        return InsertCoinMenuSelection.INSERT_FIFTY_CENTS
+        return InsertCoinOptions.INSERT_FIFTY_CENTS
     if user_selection == "4":
-        return InsertCoinMenuSelection.INSERT_ONE_DOLLAR
+        return InsertCoinOptions.INSERT_ONE_DOLLAR
     if user_selection == "0":
-        return InsertCoinMenuSelection.GO_BACK
+        return InsertCoinOptions.GO_BACK
     raise InvalidMenuSelectionError
 
 
-def get_insert_coin_input() -> InsertCoinMenuSelection:
+def get_insert_coin_input() -> InsertCoinOptions:
     while True:
         try:
             print(INSERT_COIN_MENU_DISPLAY)
             user_selection = input(PROMPT_INPUT)
-            insert_coin_selection = get_insert_coin_selection(user_selection)
+            insert_coin_selection = get_insert_coin_options(user_selection)
             return insert_coin_selection
         except InvalidMenuSelectionError:
             print(INVALID_SELECTION_DISPLAY)
 
 
-def get_select_wash_selection(user_selection: str) -> SelectWashMenuSelection:
+def get_select_wash_options(user_selection: str) -> SelectWashOptions:
     if user_selection == "1":
-        return SelectWashMenuSelection.QUICK_WASH
+        return SelectWashOptions.QUICK_WASH
     if user_selection == "2":
-        return SelectWashMenuSelection.MILD_WASH
+        return SelectWashOptions.MILD_WASH
     if user_selection == "3":
-        return SelectWashMenuSelection.MEDIUM_WASH
+        return SelectWashOptions.MEDIUM_WASH
     if user_selection == "4":
-        return SelectWashMenuSelection.HEAVY_WASH
+        return SelectWashOptions.HEAVY_WASH
     if user_selection == "0":
-        return SelectWashMenuSelection.GO_BACK
+        return SelectWashOptions.GO_BACK
     raise InvalidMenuSelectionError
 
 
-def get_select_wash_input() -> SelectWashMenuSelection:
+def get_select_wash_input() -> SelectWashOptions:
     while True:
         try:
             print(SELECT_WASH_MENU_DISPLAY)
             user_selection = input(PROMPT_INPUT)
-            select_wash_selection = get_select_wash_selection(user_selection)
+            select_wash_selection = get_select_wash_options(user_selection)
             return select_wash_selection
         except InvalidMenuSelectionError:
             print(INVALID_SELECTION_DISPLAY)
@@ -194,15 +191,15 @@ def get_select_wash_input() -> SelectWashMenuSelection:
 
 def topup_washing_machine(
     washing_machine_state: WashingMachineState,
-    insert_coin_input: InsertCoinMenuSelection,
+    insert_coin_input: InsertCoinOptions,
 ) -> None:
-    if insert_coin_input == InsertCoinMenuSelection.INSERT_TEN_CENTS:
+    if insert_coin_input == InsertCoinOptions.INSERT_TEN_CENTS:
         return washing_machine_state.topup_balance(0.1)
-    if insert_coin_input == InsertCoinMenuSelection.INSERT_TWENTY_CENTS:
+    if insert_coin_input == InsertCoinOptions.INSERT_TWENTY_CENTS:
         return washing_machine_state.topup_balance(0.2)
-    if insert_coin_input == InsertCoinMenuSelection.INSERT_FIFTY_CENTS:
+    if insert_coin_input == InsertCoinOptions.INSERT_FIFTY_CENTS:
         return washing_machine_state.topup_balance(0.5)
-    if insert_coin_input == InsertCoinMenuSelection.INSERT_ONE_DOLLAR:
+    if insert_coin_input == InsertCoinOptions.INSERT_ONE_DOLLAR:
         return washing_machine_state.topup_balance(1.0)
 
 
@@ -214,29 +211,28 @@ def get_select_wash_outcome(balance: float, wash_price: float) -> SelectWashOutc
     return SelectWashOutcome.BALANCE_LESS_THAN_WASH_PRICE
 
 
-def get_wash_price(selected_wash: SelectWashMenuSelection) -> float:
-    if selected_wash == SelectWashMenuSelection.QUICK_WASH:
+def get_wash_price(selected_wash: SelectWashOptions) -> float:
+    if selected_wash == SelectWashOptions.QUICK_WASH:
         return WASHING_TYPES["Quick Wash"]["price"]
-    if selected_wash == SelectWashMenuSelection.MILD_WASH:
+    if selected_wash == SelectWashOptions.MILD_WASH:
         return WASHING_TYPES["Mild Wash"]["price"]
-    if selected_wash == SelectWashMenuSelection.MEDIUM_WASH:
+    if selected_wash == SelectWashOptions.MEDIUM_WASH:
         return WASHING_TYPES["Medium Wash"]["price"]
     return WASHING_TYPES["Heavy Wash"]["price"]
 
 
-def get_wash_time(selected_wash: SelectWashMenuSelection) -> int:
-    if selected_wash == SelectWashMenuSelection.QUICK_WASH:
+def get_wash_time(selected_wash: SelectWashOptions) -> int:
+    if selected_wash == SelectWashOptions.QUICK_WASH:
         return WASHING_TYPES["Quick Wash"]["time"]
-    if selected_wash == SelectWashMenuSelection.MILD_WASH:
+    if selected_wash == SelectWashOptions.MILD_WASH:
         return WASHING_TYPES["Mild Wash"]["time"]
-    if selected_wash == SelectWashMenuSelection.MEDIUM_WASH:
+    if selected_wash == SelectWashOptions.MEDIUM_WASH:
         return WASHING_TYPES["Medium Wash"]["time"]
     return WASHING_TYPES["Heavy Wash"]["time"]
 
 
 def get_refund_amount(balance: float, wash_price: float) -> float:
     return balance - wash_price
-
 
 
 def show_mock_continuous_washing_job_progress(wash_time: int) -> None:
@@ -270,7 +266,7 @@ class SelectWashMenuState(State):
     def handle_input(self, context: WashingMachine):
         while True:
             select_wash_input = get_select_wash_input()
-            if select_wash_input == SelectWashMenuSelection.GO_BACK:
+            if select_wash_input == SelectWashOptions.GO_BACK:
                 context.state = UseMachineMenuState()
                 break
 
@@ -307,7 +303,7 @@ class InsertCoinMenuState(State):
     def handle_input(self, context: WashingMachine):
         while True:
             insert_coin_input = get_insert_coin_input()
-            if insert_coin_input == InsertCoinMenuSelection.GO_BACK:
+            if insert_coin_input == InsertCoinOptions.GO_BACK:
                 context.state = UseMachineMenuState()
                 break
 
@@ -317,14 +313,14 @@ class InsertCoinMenuState(State):
 
 class UseMachineMenuState(State):
     def handle_input(self, context: WashingMachine):
-        machine_menu_input = get_machine_menu_input()
-        if machine_menu_input == MachineMenuSelection.INSERT_COINS:
+        machine_menu_input = get_wash_settings_input()
+        if machine_menu_input == WashSettingsOptions.INSERT_COINS:
             context.state = InsertCoinMenuState()
 
-        if machine_menu_input == MachineMenuSelection.SELECT_WASH:
+        if machine_menu_input == WashSettingsOptions.SELECT_WASH:
             context.state = SelectWashMenuState()
 
-        if machine_menu_input == MachineMenuSelection.GO_BACK:
+        if machine_menu_input == WashSettingsOptions.GO_BACK:
             context.state = StartMenuState()
 
 
@@ -332,12 +328,12 @@ class MaintenanceMenuState(State):
     def handle_input(self, context: WashingMachine):
         while True:
             maintenance_menu_input = get_maintenance_menu_input()
-            if maintenance_menu_input == MaintenanceMenuSelection.DISPLAY_STATISTICS:
+            if maintenance_menu_input == MaintenanceOptions.DISPLAY_STATISTICS:
                 show_statistics(context.washing_machine_statistics)
-            if maintenance_menu_input == MaintenanceMenuSelection.RESET_STATISTICS:
+            if maintenance_menu_input == MaintenanceOptions.RESET_STATISTICS:
                 context.washing_machine_statistics.reset()
                 print(STATISTICS_RESET_DISPLAY)
-            if maintenance_menu_input == MaintenanceMenuSelection.GO_BACK:
+            if maintenance_menu_input == MaintenanceOptions.GO_BACK:
                 context.state = StartMenuState()
                 break
 
@@ -349,10 +345,10 @@ class StartMenuState(State):
             print(EXIT_DISPLAY)
             exit()
 
-        if start_menu_input == StartMenuOptions.GO_TO_MANTENANCE_MENU:
+        if start_menu_input == StartMenuOptions.MANTENANCE:
             context.state = MaintenanceMenuState()
 
-        if start_menu_input == StartMenuOptions.GO_TO_USE_MACHINE_MENU:
+        if start_menu_input == StartMenuOptions.WASH_SETTINGS:
             context.state = UseMachineMenuState()
 
 
