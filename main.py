@@ -1,5 +1,7 @@
 import time
 from abc import ABC
+from dataclasses import dataclass
+from typing import Final
 
 from display import (
     END_WASH_DISPLAY,
@@ -28,6 +30,23 @@ from enums import (
     StartMenuOptions,
     WashSettingsOptions,
 )
+
+
+@dataclass
+class WashingTypeData:
+    time: int
+    price: float
+
+
+@dataclass
+class WashingTypes:
+    QUICK_WASH: Final = WashingTypeData(10, 2.00)
+    MILD_WASH: Final = WashingTypeData(10, 2.00)
+    MEDIUM_WASH: Final = WashingTypeData(10, 2.00)
+    HEAVY_WASH: Final = WashingTypeData(10, 2.00)
+
+
+DEFAULT_WASHING_TYPES = WashingTypes()
 
 USER_INPUT_TO_START_OPTIONS_MAPPING = {
     "1": StartMenuOptions.WASH_SETTINGS,
@@ -69,6 +88,7 @@ INSERT_COIN_OPTIONS_TO_COIN_VALUE_MAPPING = {
     InsertCoinOptions.INSERT_FIFTY_CENTS: 0.50,
     InsertCoinOptions.INSERT_ONE_DOLLAR: 1.00,
 }
+
 
 class InvalidMenuSelectionError(Exception):
     pass
@@ -194,32 +214,24 @@ def get_select_wash_outcome(balance: float, wash_price: float) -> SelectWashOutc
     return SelectWashOutcome.BALANCE_LESS_THAN_WASH_PRICE
 
 
-WASHING_TYPES = {
-    "Quick Wash": {"time": 10, "price": 2.00},
-    "Mild Wash": {"time": 30, "price": 2.5},
-    "Medium Wash": {"time": 45, "price": 4.20},
-    "Heavy Wash": {"time": 60, "price": 6.00},
-}
-
-
 def get_wash_price(selected_wash: SelectWashOptions) -> float:
     if selected_wash == SelectWashOptions.QUICK_WASH:
-        return WASHING_TYPES["Quick Wash"]["price"]
+        return DEFAULT_WASHING_TYPES.QUICK_WASH.price
     if selected_wash == SelectWashOptions.MILD_WASH:
-        return WASHING_TYPES["Mild Wash"]["price"]
+        return DEFAULT_WASHING_TYPES.MILD_WASH.price
     if selected_wash == SelectWashOptions.MEDIUM_WASH:
-        return WASHING_TYPES["Medium Wash"]["price"]
-    return WASHING_TYPES["Heavy Wash"]["price"]
+        return DEFAULT_WASHING_TYPES.MEDIUM_WASH.price
+    return DEFAULT_WASHING_TYPES.HEAVY_WASH.price
 
 
-def get_wash_time(selected_wash: SelectWashOptions) -> int:
+def get_wash_time(selected_wash: SelectWashOptions) -> float:
     if selected_wash == SelectWashOptions.QUICK_WASH:
-        return WASHING_TYPES["Quick Wash"]["time"]
+        return DEFAULT_WASHING_TYPES.QUICK_WASH.time
     if selected_wash == SelectWashOptions.MILD_WASH:
-        return WASHING_TYPES["Mild Wash"]["time"]
+        return DEFAULT_WASHING_TYPES.MILD_WASH.time
     if selected_wash == SelectWashOptions.MEDIUM_WASH:
-        return WASHING_TYPES["Medium Wash"]["time"]
-    return WASHING_TYPES["Heavy Wash"]["time"]
+        return DEFAULT_WASHING_TYPES.MEDIUM_WASH.time
+    return DEFAULT_WASHING_TYPES.HEAVY_WASH.time
 
 
 def get_refund_amount(balance: float, wash_price: float) -> float:

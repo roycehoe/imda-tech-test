@@ -21,6 +21,13 @@ class InsertCoinOptions(Enum):
     GO_BACK = auto()
 
 
+class WashingTypes(Enum):
+    QUICK_WASH = auto()
+    MILD_WASH = auto()
+    MEDIUM_WASH = auto()
+    HEAVY_WASH = auto()
+
+
 class SelectWashOptions(Enum):
     QUICK_WASH = auto()
     MILD_WASH = auto()
