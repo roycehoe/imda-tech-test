@@ -45,11 +45,13 @@ class WashingMachine:
         state: State,
         statistics: WashingMachineStatistics,
         balance: WashingMachineBalance,
+        is_door_locked: bool = False,
     ):
 
         self.state = state
         self.statistics = statistics
         self.balance = balance
+        self.is_door_locked = is_door_locked
 
     def run(self) -> None:
         while self.state is not None:
@@ -57,6 +59,9 @@ class WashingMachine:
 
     def change_state(self, new_state: State) -> None:
         self.state = new_state
+
+    def change_door_locked_status(self, new_door_locked_status: bool) -> None:
+        self.is_door_locked = new_door_locked_status
 
 
 class SelectWashMenuState(State):
@@ -108,8 +113,10 @@ class SelectWashMenuState(State):
     ):
         washing_machine.statistics.add_total_time_switched_on_minutes(wash_time)
 
+        washing_machine.change_door_locked_status(True)
         print(START_WASH_DISPLAY)
         simulate_washing_progress(wash_time)
+        washing_machine.change_door_locked_status(False)
         print(END_WASH_DISPLAY)
 
 
