@@ -1,25 +1,16 @@
 import time
-from abc import ABC
-from dataclasses import dataclass
 from enum import Enum
 from typing import TypeVar
 
-from constants import (
-    DEFAULT_WASHING_TYPES,
-    INSERT_COIN_OPTIONS_TO_COIN_VALUE_MAPPING,
-)
+from constants import DEFAULT_WASHING_TYPES, INSERT_COIN_OPTIONS_TO_COIN_VALUE_MAPPING
 from display import (
     INVALID_SELECTION_DISPLAY,
     PROMPT_INPUT,
     get_washing_job_progress_display,
 )
-from enums import (
-    InsertCoinOptions,
-    SelectWashOptions,
-    SelectWashOutcome,
-)
+from enums import InsertCoinOptions, SelectWashOptions, SelectWashOutcome
 from exceptions import InvalidCoinValueError, InvalidMenuSelectionError
-from main import WashingMachineBalance
+from models import WashingMachineBalance
 
 T = TypeVar("T", bound=Enum)
 
@@ -45,14 +36,14 @@ def get_user_menu_input(
 
 
 def topup_washing_machine(
-    washing_machine_state: WashingMachineBalance,
+    washing_machine_balance: WashingMachineBalance,
     insert_coin_input: InsertCoinOptions,
     coin_value_mapping: dict[
         InsertCoinOptions, float
     ] = INSERT_COIN_OPTIONS_TO_COIN_VALUE_MAPPING,
 ) -> None:
     if coin_value := coin_value_mapping.get(insert_coin_input):
-        return washing_machine_state.topup_balance(coin_value)
+        return washing_machine_balance.topup_balance(coin_value)
     raise InvalidCoinValueError
 
 
