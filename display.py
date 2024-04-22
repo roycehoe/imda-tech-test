@@ -116,3 +116,6 @@ Please select one of the following washes:
 [4] Heavy Wash: 1 hour - $6.00
 
 Otherwise, press [0] to go back"""
+
+class WashingMachineDisplay:
+    ...

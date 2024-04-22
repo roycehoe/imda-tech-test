@@ -1,3 +1,5 @@
+from abc import ABC, abstractmethod
+
 from constants import (
     USER_INPUT_TO_INSERT_COIN_OPTIONS_MAPPING,
     USER_INPUT_TO_MAINTENANCE_OPTIONS_MAPPING,
@@ -27,7 +29,8 @@ from enums import (
     StartMenuOptions,
     WashSettingsOptions,
 )
-from models import State, WashingMachineBalance, WashingMachineStatistics
+from models import State, WashingMachineInterface
+from state import WashingMachineBalance, WashingMachineStatistics
 from utils import (
     get_refund_amount,
     get_select_wash_outcome,
@@ -65,7 +68,7 @@ class WashingMachine:
 
 
 class SelectWashMenuState(State):
-    def handle_input(self, washing_machine: WashingMachine):
+    def handle_input(self, washing_machine: WashingMachineInterface):
         while True:
 
             selected_wash_input = get_user_menu_input(
@@ -92,7 +95,7 @@ class SelectWashMenuState(State):
 
     def _handle_payment(
         self,
-        washing_machine: WashingMachine,
+        washing_machine: WashingMachineInterface,
         outcome: SelectWashOutcome,
         wash_price: float,
     ):
@@ -108,7 +111,7 @@ class SelectWashMenuState(State):
 
     def _handle_wash_clothes(
         self,
-        washing_machine: WashingMachine,
+        washing_machine: WashingMachineInterface,
         wash_time: int,
     ):
         washing_machine.statistics.add_total_time_switched_on_minutes(wash_time)

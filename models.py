@@ -1,49 +1,35 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from constants import DEFAULT_MONEY_EARNED, DEFAULT_TOTAL_TIME_SWITCHED_ON_MINUTES
+from state import WashingMachineBalance, WashingMachineStatistics
+
 
 class State(ABC):
     def handle_input(self, context):
         raise NotImplementedError
 
 
-@dataclass
-class WashingMachineBalance:
-    balance: float = 0.00
+class WashingMachineInterface(ABC):
+    def __init__(
+        self,
+        state: State,
+        statistics: WashingMachineStatistics,
+        balance: WashingMachineBalance,
+        is_door_locked=False,
+    ):
+        self.state = state
+        self.statistics = statistics
+        self.balance = balance
+        self.is_door_locked = is_door_locked
 
-    def topup_balance(self, money: float):
-        self.balance += money
+    @abstractmethod
+    def run(self):
+        pass
 
-    def reset_balance(self, money: float):
-        self.balance -= money
+    @abstractmethod
+    def change_state(self, new_state):
+        pass
 
-    def __str__(self):
-        return f"""-------------------------------------
-Current balance: ${self.balance:.2f}
--------------------------------------"""
-
-
-@dataclass
-class WashingMachineStatistics:
-    total_time_switched_on_minutes: int = DEFAULT_TOTAL_TIME_SWITCHED_ON_MINUTES
-    money_earned: float = DEFAULT_MONEY_EARNED
-
-    def reset(self):
-        self.total_time_switched_on_minutes = DEFAULT_TOTAL_TIME_SWITCHED_ON_MINUTES
-        self.money_earned = DEFAULT_MONEY_EARNED
-
-    def add_total_time_switched_on_minutes(self, additional_time: int):
-        self.total_time_switched_on_minutes += additional_time
-
-    def add_money_earned(self, additional_money_earned: float):
-        self.money_earned += additional_money_earned
-
-    def __str__(self):
-        return f"""
-========Getting Statistics===========
-
-------------------------------------------------------------------------
-Total time switched on: {self.total_time_switched_on_minutes} minutes 
-Balance: ${self.money_earned:.2f}
-------------------------------------------------------------------------"""
+    @abstractmethod
+    def change_door_locked_status(self, new_door_locked_status: bool):
+        pass
