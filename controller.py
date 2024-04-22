@@ -21,7 +21,12 @@ from enums import (
     WashSettingsOptions,
 )
 from exceptions import InvalidCoinValueError, InvalidMenuSelectionError
-from models import WashingMachineBalanceInterface, WashingMachineStatisticsInterface
+from models import (
+    WashingMachineBalanceInterface,
+    WashingMachineController,
+    WashingMachineInterface,
+    WashingMachineStatisticsInterface,
+)
 from utils import get_refund_amount, get_wash_outcome, simulate_washing_progress
 from view import (
     InsertCoinMenuView,
@@ -74,11 +79,11 @@ Balance: ${self.money_earned:.2f}
 
 
 @dataclass
-class WashingMachine:
+class WashingMachine(WashingMachineInterface):
     statistics: WashingMachineStatistics
     balance: WashingMachineBalance
 
-    controller = None
+    controller: WashingMachineController = None
     is_door_locked: bool = False
 
     def run(self) -> None:
@@ -94,7 +99,7 @@ class WashingMachine:
 
 @dataclass
 class InsertCoinMenuModel:
-    state: WashingMachine
+    state: WashingMachineInterface
 
     input_mapping = USER_INPUT_TO_INSERT_COIN_OPTIONS_MAPPING
     coin_value_mapping = INSERT_COIN_OPTIONS_TO_COIN_VALUE_MAPPING
@@ -117,8 +122,8 @@ class InsertCoinMenuModel:
 
 
 @dataclass
-class InsertCoinMenuController:
-    state: WashingMachine
+class InsertCoinMenuController(WashingMachineController):
+    state: WashingMachineInterface
 
     def __post_init__(self):
         self.model = InsertCoinMenuModel(state=self.state)
@@ -151,7 +156,7 @@ class InsertCoinMenuController:
 
 @dataclass
 class StartMenuModel:
-    state: WashingMachine
+    state: WashingMachineInterface
 
     input_mapping = USER_INPUT_TO_START_OPTIONS_MAPPING
 
@@ -165,8 +170,8 @@ class StartMenuModel:
 
 
 @dataclass
-class StartMenuController:
-    state: WashingMachine
+class StartMenuController(WashingMachineController):
+    state: WashingMachineInterface
     view = StartMenuView()
 
     def __post_init__(self):
@@ -199,7 +204,7 @@ class StartMenuController:
 
 @dataclass
 class MaintenanceMenuModel:
-    state: WashingMachine
+    state: WashingMachineInterface
     input_mapping = USER_INPUT_TO_MAINTENANCE_OPTIONS_MAPPING
 
     def change_machine_state(self, new_state):
@@ -215,8 +220,8 @@ class MaintenanceMenuModel:
 
 
 @dataclass
-class MaintenanceMenuController:
-    state: WashingMachine
+class MaintenanceMenuController(WashingMachineController):
+    state: WashingMachineInterface
 
     def __post_init__(self):
         self.model = MaintenanceMenuModel(state=self.state)
@@ -248,7 +253,7 @@ class MaintenanceMenuController:
 
 @dataclass
 class WashSettingsMenuModel:
-    state: WashingMachine
+    state: WashingMachineInterface
     input_mapping = USER_INPUT_TO_WASH_SETTINGS_OPTIONS_MAPPING
 
     def change_machine_state(self, new_controller):
@@ -261,8 +266,8 @@ class WashSettingsMenuModel:
 
 
 @dataclass
-class WashSettingsMenuController:
-    state: WashingMachine
+class WashSettingsMenuController(WashingMachineController):
+    state: WashingMachineInterface
     view = WashSettingsMenuView()
 
     def __post_init__(self):
@@ -295,7 +300,7 @@ class WashSettingsMenuController:
 
 @dataclass
 class SelectWashMenuModel:
-    state: WashingMachine
+    state: WashingMachineInterface
     input_mapping = USER_INPUT_TO_SELECT_WASH_OPTIONS_MAPPING
     wash_data = DEFAULT_WASH_DATA
 
@@ -336,8 +341,8 @@ class SelectWashMenuModel:
 
 
 @dataclass
-class SelectWashMenuController:
-    state: WashingMachine
+class SelectWashMenuController(WashingMachineController):
+    state: WashingMachineInterface
 
     def __post_init__(self):
         self.model = SelectWashMenuModel(state=self.state)
@@ -352,6 +357,11 @@ class SelectWashMenuController:
                 print(self.view.menu)
                 user_input = input(self.view.prompt_input)
                 parsed_user_input = self.model.parse_user_input(user_input)
+
+                if parsed_user_input == SelectWashOptions.GO_BACK:
+                    self.model.change_machine_controller(
+                        WashSettingsMenuController(self.state)
+                    )
 
                 wash_data = self.model.get_wash_data(parsed_user_input)
                 wash_outcome = get_wash_outcome(

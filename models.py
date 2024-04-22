@@ -44,27 +44,27 @@ class WashingMachineStateInterface(ABC):
         raise NotImplementedError
 
 
-class WashingMachineInterface(ABC):
-    def __init__(
-        self,
-        state: WashingMachineStateInterface,
-        statistics: WashingMachineStatisticsInterface,
-        balance: WashingMachineBalanceInterface,
-        is_door_locked=False,
-    ):
-        self.state = state
-        self.statistics = statistics
-        self.balance = balance
-        self.is_door_locked = is_door_locked
-
+class WashingMachineController(ABC):
     @abstractmethod
     def run(self):
         pass
 
+
+class WashingMachineInterface(ABC):
+    statistics: WashingMachineStatisticsInterface
+    balance: WashingMachineBalanceInterface
+
+    controller: WashingMachineController
+    is_door_locked: bool = False
+
     @abstractmethod
-    def change_state(self, new_state):
+    def run(self) -> None:
         pass
 
     @abstractmethod
-    def change_door_locked_status(self, new_door_locked_status: bool):
+    def change_controller(self, new_controller: WashingMachineController) -> None:
+        pass
+
+    @abstractmethod
+    def change_door_locked_status(self, new_door_locked_status: bool) -> None:
         pass
