@@ -37,7 +37,7 @@ from enums import (
 )
 from exceptions import InvalidCoinValueError, InvalidMenuSelectionError
 from models import WashingMachineBalanceInterface, WashingMachineStatisticsInterface
-from utils import simulate_washing_progress
+from utils import get_refund_amount, get_wash_outcome, simulate_washing_progress
 
 
 @dataclass
@@ -293,7 +293,7 @@ class WashSettingsMenuModel:
     state: WashingMachine
     input_mapping = USER_INPUT_TO_WASH_SETTINGS_OPTIONS_MAPPING
 
-    def change_machine_controller(self, new_controller):
+    def change_machine_state(self, new_controller):
         self.state.change_controller(new_controller)
 
     def parse_user_input(self, user_input: str) -> WashSettingsOptions:
@@ -336,8 +336,7 @@ class WashSettingsMenuController:
                     break
 
                 if parsed_user_input == WashSettingsOptions.GO_BACK:
-                    # self.model.change_machine_state(StartMenuController(self.state))
-                    self.state.change_controller(StartMenuController(self.state))
+                    self.model.change_machine_state(StartMenuController(self.state))
                     break
             except InvalidMenuSelectionError:
                 print(self.view.invalid_selection)
@@ -365,16 +364,6 @@ class SelectWashMenuModel:
         if selected_wash == SelectWashOptions.MEDIUM_WASH:
             return self.wash_data.MEDIUM_WASH
         return self.wash_data.HEAVY_WASH
-
-    def get_wash_outcome(self, balance: float, wash_price: float) -> SelectWashOutcome:
-        if balance == wash_price:
-            return SelectWashOutcome.BALANCE_EQUALS_TO_WASH_PRICE
-        if balance > wash_price:
-            return SelectWashOutcome.BALANCE_MORE_THAN_WASH_PRICE
-        return SelectWashOutcome.BALANCE_LESS_THAN_WASH_PRICE
-
-    def get_refund_amount(self, balance: float, wash_price: float) -> float:
-        return balance - wash_price
 
     def reduce_washing_machine_balance(self, wash_price: float) -> None:
         self.state.balance.reduce_balance(wash_price)
@@ -433,7 +422,7 @@ class SelectWashMenuController:
                 parsed_user_input = self.model.parse_user_input(user_input)
 
                 wash_data = self.model.get_wash_data(parsed_user_input)
-                wash_outcome = self.model.get_wash_outcome(
+                wash_outcome = get_wash_outcome(
                     self.state.balance.balance, wash_data.price
                 )
                 if wash_outcome == SelectWashOutcome.BALANCE_LESS_THAN_WASH_PRICE:
@@ -441,7 +430,7 @@ class SelectWashMenuController:
                     return
 
                 if wash_outcome == SelectWashOutcome.BALANCE_MORE_THAN_WASH_PRICE:
-                    refund_amount = self.model.get_refund_amount(
+                    refund_amount = get_refund_amount(
                         self.state.balance.balance, wash_data.price
                     )
                     print(self.view.get_refund_amount_display(refund_amount))
