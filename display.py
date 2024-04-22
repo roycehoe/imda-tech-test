@@ -22,7 +22,7 @@ Wash finished! The door is now unlocked.
 Please don't forget to take your clothes!"""
 
 
-STATISTICS_RESET_DISPLAY = """
+STATISTICS_RESET_SUCCESS_DISPLAY = """
 ========Resetting Statistics=========
 ======Statistics Reset Complete======"""
 

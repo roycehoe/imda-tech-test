@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Any
 
 from constants import (
     DEFAULT_WASH_DATA,
@@ -22,6 +21,7 @@ from display import (
     MENU_WASH_SETTINGS_DISPLAY,
     PROMPT_INPUT,
     START_WASH_DISPLAY,
+    STATISTICS_RESET_SUCCESS_DISPLAY,
     TOPUP_SUCCESS_DISPLAY,
     get_menu_select_wash_display,
 )
@@ -34,7 +34,7 @@ from enums import (
     WashSettingsOptions,
 )
 from exceptions import InvalidCoinValueError, InvalidMenuSelectionError
-from state import WashingMachineBalance, WashingMachineStatistics, WashSettingsMenuState
+from state import WashingMachineBalance, WashingMachineStatistics
 from utils import simulate_washing_progress
 
 
@@ -106,19 +106,24 @@ class InsertCoinMenuController:
 
     def handle_user_input(self):
         while True:
-            print(self.view.menu)
-            user_input = input(self.view.prompt_input)
-            parsed_user_input = self.model.parse_user_input(user_input)
+            try:
+                print(self.view.menu)
+                user_input = input(self.view.prompt_input)
+                parsed_user_input = self.model.parse_user_input(user_input)
 
-            if parsed_user_input == InsertCoinOptions.GO_BACK:
-                self.model.change_machine_state(WashSettingsMenuController(self.state))
-                break
+                if parsed_user_input == InsertCoinOptions.GO_BACK:
+                    self.model.change_machine_state(
+                        WashSettingsMenuController(self.state)
+                    )
+                    break
 
-            topup_value = self.model.get_coin_value(parsed_user_input)
-            self.model.topup_washing_machine(topup_value)
+                topup_value = self.model.get_coin_value(parsed_user_input)
+                self.model.topup_washing_machine(topup_value)
 
-            print(self.view.topup_success)
-            print(self.view.balance)
+                print(self.view.topup_success)
+                print(self.view.balance)
+            except InvalidMenuSelectionError:
+                print(self.view.invalid_selection)
 
 
 @dataclass
@@ -157,20 +162,24 @@ class StartMenuController:
 
     def handle_user_input(self):
         while True:
-            print(self.view.menu)
-            user_input = input(self.view.prompt_input)
-            parsed_user_input = self.model.parse_user_input(user_input)
+            try:
+                print(self.view.menu)
+                user_input = input(self.view.prompt_input)
+                parsed_user_input = self.model.parse_user_input(user_input)
 
-            if parsed_user_input == StartMenuOptions.EXIT:
-                print(self.view.exit)
-                exit()
+                if parsed_user_input == StartMenuOptions.EXIT:
+                    print(self.view.exit)
+                    exit()
 
-            if parsed_user_input == StartMenuOptions.MANTENANCE:
-                self.state.change_controller(MaintenanceMenuController(self.state))
+                if parsed_user_input == StartMenuOptions.MANTENANCE:
+                    self.state.change_controller(MaintenanceMenuController(self.state))
+                    break
 
-            if parsed_user_input == StartMenuOptions.WASH_SETTINGS:
-                self.state.change_controller(WashSettingsMenuController(self.state))
-                break
+                if parsed_user_input == StartMenuOptions.WASH_SETTINGS:
+                    self.state.change_controller(WashSettingsMenuController(self.state))
+                    break
+            except InvalidMenuSelectionError:
+                print(self.view.invalid_selection)
 
 
 @dataclass
@@ -197,6 +206,7 @@ class MaintenanceMenuView:
     menu = MENU_MAINTENANCE_DISPLAY
     invalid_selection = INVALID_SELECTION_DISPLAY
     prompt_input = PROMPT_INPUT
+    statistics_reset_success = STATISTICS_RESET_SUCCESS_DISPLAY
     statistics = None
 
     def __post_init__(self):
@@ -216,19 +226,23 @@ class MaintenanceMenuController:
 
     def handle_user_input(self):
         while True:
-            print(self.view.menu)
-            user_input = input(self.view.prompt_input)
-            parsed_user_input = self.model.parse_user_input(user_input)
+            try:
+                print(self.view.menu)
+                user_input = input(self.view.prompt_input)
+                parsed_user_input = self.model.parse_user_input(user_input)
 
-            if parsed_user_input == MaintenanceOptions.GO_BACK:
-                self.state.change_controller(StartMenuController(self.state))
-                break
+                if parsed_user_input == MaintenanceOptions.GO_BACK:
+                    self.state.change_controller(StartMenuController(self.state))
+                    break
 
-            if parsed_user_input == MaintenanceOptions.DISPLAY_STATISTICS:
-                print(self.view.statistics)
+                if parsed_user_input == MaintenanceOptions.DISPLAY_STATISTICS:
+                    print(self.view.statistics)
 
-            if parsed_user_input == MaintenanceOptions.RESET_STATISTICS:
-                self.model.reset_statistics()
+                if parsed_user_input == MaintenanceOptions.RESET_STATISTICS:
+                    self.model.reset_statistics()
+                    print(self.view.statistics_reset_success)
+            except InvalidMenuSelectionError:
+                print(self.view.invalid_selection)
 
 
 @dataclass
@@ -265,22 +279,25 @@ class WashSettingsMenuController:
 
     def handle_user_input(self):
         while True:
-            print(self.view.menu)
-            user_input = input(self.view.prompt_input)
-            parsed_user_input = self.model.parse_user_input(user_input)
+            try:
+                print(self.view.menu)
+                user_input = input(self.view.prompt_input)
+                parsed_user_input = self.model.parse_user_input(user_input)
 
-            if parsed_user_input == WashSettingsOptions.INSERT_COINS:
-                self.state.change_controller(InsertCoinMenuController(self.state))
-                break
+                if parsed_user_input == WashSettingsOptions.INSERT_COINS:
+                    self.state.change_controller(InsertCoinMenuController(self.state))
+                    break
 
-            if parsed_user_input == WashSettingsOptions.SELECT_WASH:
-                self.state.change_controller(SelectWashMenuController(self.state))
-                break
+                if parsed_user_input == WashSettingsOptions.SELECT_WASH:
+                    self.state.change_controller(SelectWashMenuController(self.state))
+                    break
 
-            if parsed_user_input == WashSettingsOptions.GO_BACK:
-                # self.model.change_machine_state(StartMenuController(self.state))
-                self.state.change_controller(StartMenuController(self.state))
-                break
+                if parsed_user_input == WashSettingsOptions.GO_BACK:
+                    # self.model.change_machine_state(StartMenuController(self.state))
+                    self.state.change_controller(StartMenuController(self.state))
+                    break
+            except InvalidMenuSelectionError:
+                print(self.view.invalid_selection)
 
 
 @dataclass
@@ -367,35 +384,38 @@ class SelectWashMenuController:
 
     def handle_user_input(self):
         while True:
-            print(self.view.menu)
-            user_input = input(self.view.prompt_input)
-            parsed_user_input = self.model.parse_user_input(user_input)
+            try:
+                print(self.view.menu)
+                user_input = input(self.view.prompt_input)
+                parsed_user_input = self.model.parse_user_input(user_input)
 
-            wash_data = self.model.get_wash_data(parsed_user_input)
-            wash_outcome = self.model.get_wash_outcome(
-                self.state.balance.balance, wash_data.price
-            )
-            if wash_outcome == SelectWashOutcome.BALANCE_LESS_THAN_WASH_PRICE:
-                print(self.view.insufficient_funds)
-                return
-
-            if wash_outcome == SelectWashOutcome.BALANCE_MORE_THAN_WASH_PRICE:
-                refund_amount = self.model.get_refund_amount(
+                wash_data = self.model.get_wash_data(parsed_user_input)
+                wash_outcome = self.model.get_wash_outcome(
                     self.state.balance.balance, wash_data.price
                 )
-                print(self.view.get_refund_amount_display(refund_amount))
-            self.model.reduce_washing_machine_balance(wash_data.price)
-            self.model.increase_washing_machine_money_earned(wash_data.price)
-            self.model.add_washing_machine_total_time_switched_on_minutes(
-                wash_data.time
-            )
-            print(self.view.start_wash)
-            self.model.change_washing_machine_door_lock_status(True)
-            simulate_washing_progress(wash_data.time)  # To put this in class
-            self.model.change_washing_machine_door_lock_status(False)
-            print(self.view.end_wash)
-            self.model.change_machine_controller(StartMenuController(self.state))
-            break
+                if wash_outcome == SelectWashOutcome.BALANCE_LESS_THAN_WASH_PRICE:
+                    print(self.view.insufficient_funds)
+                    return
+
+                if wash_outcome == SelectWashOutcome.BALANCE_MORE_THAN_WASH_PRICE:
+                    refund_amount = self.model.get_refund_amount(
+                        self.state.balance.balance, wash_data.price
+                    )
+                    print(self.view.get_refund_amount_display(refund_amount))
+                self.model.reduce_washing_machine_balance(wash_data.price)
+                self.model.increase_washing_machine_money_earned(wash_data.price)
+                self.model.add_washing_machine_total_time_switched_on_minutes(
+                    wash_data.time
+                )
+                print(self.view.start_wash)
+                self.model.change_washing_machine_door_lock_status(True)
+                simulate_washing_progress(wash_data.time)  # To put this in class
+                self.model.change_washing_machine_door_lock_status(False)
+                print(self.view.end_wash)
+                self.model.change_machine_controller(StartMenuController(self.state))
+                break
+            except InvalidMenuSelectionError:
+                print(self.view.invalid_selection)
 
 
 washing_machine = WashingMachine(WashingMachineStatistics(), WashingMachineBalance())

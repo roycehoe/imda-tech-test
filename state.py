@@ -18,7 +18,7 @@ from display import (
     MENU_START_DISPLAY,
     MENU_WASH_SETTINGS_DISPLAY,
     START_WASH_DISPLAY,
-    STATISTICS_RESET_DISPLAY,
+    STATISTICS_RESET_SUCCESS_DISPLAY,
     TOPUP_SUCCESS_DISPLAY,
     get_menu_select_wash_display,
     get_refund_excess_display,
@@ -184,7 +184,7 @@ class MaintenanceMenuState(WashingMachineStateInterface):
                 print(washing_machine.statistics)
             if maintenance_menu_input == MaintenanceOptions.RESET_STATISTICS:
                 washing_machine.statistics.reset()
-                print(STATISTICS_RESET_DISPLAY)
+                print(STATISTICS_RESET_SUCCESS_DISPLAY)
             if maintenance_menu_input == MaintenanceOptions.GO_BACK:
                 washing_machine.change_state(StartMenuState())
                 break
