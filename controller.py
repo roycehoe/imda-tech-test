@@ -1,12 +1,15 @@
 from dataclasses import dataclass
+from typing import Any
 
 from constants import (
     INSERT_COIN_OPTIONS_TO_COIN_VALUE_MAPPING,
     USER_INPUT_TO_INSERT_COIN_OPTIONS_MAPPING,
+    USER_INPUT_TO_START_OPTIONS_MAPPING,
 )
 from display import (
     INVALID_SELECTION_DISPLAY,
     MENU_INSERT_COIN_DISPLAY,
+    MENU_START_DISPLAY,
     PROMPT_INPUT,
     TOPUP_SUCCESS_DISPLAY,
 )
@@ -15,18 +18,13 @@ from exceptions import InvalidMenuSelectionError
 from state import WashingMachineBalance, WashingMachineStatistics, WashSettingsMenuState
 
 
+@dataclass
 class WashingMachine:
-    def __init__(
-        self,
-        statistics: WashingMachineStatistics,
-        balance: WashingMachineBalance,
-        controller=None,
-        is_door_locked: bool = False,
-    ):
-        self.statistics = statistics
-        self.controller = controller
-        self.balance = balance
-        self.is_door_locked = is_door_locked
+    statistics: WashingMachineStatistics
+    balance: WashingMachineBalance
+
+    controller = None
+    is_door_locked: bool = False
 
     def run(self) -> None:
         while self.controller is not None:
@@ -40,22 +38,15 @@ class WashingMachine:
 
 
 @dataclass
-class SelectWashMenuView:
-    def __init__(self, state: WashingMachine):
-        self.state = state
-        self.menu = MENU_INSERT_COIN_DISPLAY
-        self.topup_success = TOPUP_SUCCESS_DISPLAY
-        self.invalid_selection = INVALID_SELECTION_DISPLAY
-        self.prompt_input = PROMPT_INPUT
-        self.balance = self.state.balance
-
-
 class InsertCoinMenuModel:
-    def __init__(self, state: WashingMachine):
-        self.state = state
-        self.view = SelectWashMenuView(state)
-        self.input_mapping = USER_INPUT_TO_INSERT_COIN_OPTIONS_MAPPING
-        self.coin_value_mapping = INSERT_COIN_OPTIONS_TO_COIN_VALUE_MAPPING
+    state: WashingMachine
+
+    input_mapping = USER_INPUT_TO_INSERT_COIN_OPTIONS_MAPPING
+    coin_value_mapping = INSERT_COIN_OPTIONS_TO_COIN_VALUE_MAPPING
+    view = None
+
+    def __post_init__(self):
+        self.view = InsertCoinMenuView(self.state)
 
     def topup_washing_machine(self, topup_amount: float) -> None:
         self.state.balance.topup_balance(topup_amount)
@@ -74,12 +65,25 @@ class InsertCoinMenuModel:
         raise Exception
 
 
-class InsertCoinMenuController:
-    def __init__(self, state: WashingMachine):
-        self.state = state
+@dataclass
+class InsertCoinMenuView:
+    state: WashingMachine
+    menu = MENU_INSERT_COIN_DISPLAY
+    topup_success = TOPUP_SUCCESS_DISPLAY
+    invalid_selection = INVALID_SELECTION_DISPLAY
+    prompt_input = PROMPT_INPUT
 
-        self.model = InsertCoinMenuModel(state)
-        self.view = SelectWashMenuView(state)
+    def __post_init__(self):
+        self.balance = self.state.balance
+
+
+@dataclass
+class InsertCoinMenuController:
+    state: WashingMachine
+
+    def __post_init__(self):
+        self.model = InsertCoinMenuModel(state=self.state)
+        self.view = InsertCoinMenuView(self.state)
 
     def run(self):
         self.handle_user_input()
@@ -99,6 +103,19 @@ class InsertCoinMenuController:
 
             print(self.view.topup_success)
             print(self.view.balance)
+
+
+# @dataclass
+# class StartMenuView:
+#     menu = MENU_START_DISPLAY
+#     invalid_selection = INVALID_SELECTION_DISPLAY
+#     prompt_input = PROMPT_INPUT
+
+# @dataclass
+# class StartMenuModel:
+#     menu = MENU_START_DISPLAY
+#     invalid_selection = INVALID_SELECTION_DISPLAY
+#     prompt_input = PROMPT_INPUT
 
 
 washing_machine = WashingMachine(WashingMachineStatistics(), WashingMachineBalance())
