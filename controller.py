@@ -6,6 +6,7 @@ from constants import (
     USER_INPUT_TO_INSERT_COIN_OPTIONS_MAPPING,
     USER_INPUT_TO_MAINTENANCE_OPTIONS_MAPPING,
     USER_INPUT_TO_START_OPTIONS_MAPPING,
+    USER_INPUT_TO_WASH_SETTINGS_OPTIONS_MAPPING,
 )
 from display import (
     EXIT_DISPLAY,
@@ -13,10 +14,16 @@ from display import (
     MENU_INSERT_COIN_DISPLAY,
     MENU_MAINTENANCE_DISPLAY,
     MENU_START_DISPLAY,
+    MENU_WASH_SETTINGS_DISPLAY,
     PROMPT_INPUT,
     TOPUP_SUCCESS_DISPLAY,
 )
-from enums import InsertCoinOptions, MaintenanceOptions, StartMenuOptions
+from enums import (
+    InsertCoinOptions,
+    MaintenanceOptions,
+    StartMenuOptions,
+    WashSettingsOptions,
+)
 from exceptions import InvalidCoinValueError, InvalidMenuSelectionError
 from state import WashingMachineBalance, WashingMachineStatistics, WashSettingsMenuState
 
@@ -77,7 +84,7 @@ class InsertCoinMenuView:
 
 
 @dataclass
-class StartMenuController:
+class InsertCoinMenuController:
     state: WashingMachine
 
     def __post_init__(self):
@@ -211,6 +218,54 @@ class MaintenanceMenuController:
 
             if parsed_user_input == MaintenanceOptions.RESET_STATISTICS:
                 self.model.reset_statistics()
+
+
+@dataclass
+class WashSettingsMenuModel:
+    state: WashingMachine
+    input_mapping = USER_INPUT_TO_WASH_SETTINGS_OPTIONS_MAPPING
+
+    def change_machine_controller(self, new_controller):
+        self.state.change_controller(new_controller)
+
+    def parse_user_input(self, user_input: str) -> WashSettingsOptions:
+        if selected_option := self.input_mapping.get(user_input):
+            return selected_option
+        raise InvalidMenuSelectionError
+
+
+@dataclass
+class WashSettingsMenuView:
+    menu = MENU_WASH_SETTINGS_DISPLAY
+    invalid_selection = INVALID_SELECTION_DISPLAY
+    prompt_input = PROMPT_INPUT
+
+
+@dataclass
+class WashSettingsMenuController:
+    state: WashingMachine
+    view = WashSettingsMenuView()
+
+    def __post_init__(self):
+        self.model = MaintenanceMenuModel(state=self.state)
+
+    def run(self):
+        self.handle_user_input()
+
+    def handle_user_input(self):
+        while True:
+            print(self.view.menu)
+            user_input = input(self.view.prompt_input)
+            parsed_user_input = self.model.parse_user_input(user_input)
+
+            if parsed_user_input == WashSettingsOptions.INSERT_COINS:
+                self.model.change_machine_state(InsertCoinMenuController(self.state))
+
+            # if parsed_user_input == WashSettingsOptions.SELECT_WASH:
+            #     washing_machine.change_state(SelectWashMenuState())
+
+            if parsed_user_input == WashSettingsOptions.GO_BACK:
+                self.model.change_machine_state(StartMenuController(self.state))
 
 
 washing_machine = WashingMachine(WashingMachineStatistics(), WashingMachineBalance())
