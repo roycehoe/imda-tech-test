@@ -1,11 +1,11 @@
-from models import State
+from models import WashingMachineStateInterface
 from state import StartMenuState, WashingMachineBalance, WashingMachineStatistics
 
 
 class WashingMachine:
     def __init__(
         self,
-        state: State,
+        state: WashingMachineStateInterface,
         statistics: WashingMachineStatistics,
         balance: WashingMachineBalance,
         is_door_locked: bool = False,
@@ -20,7 +20,7 @@ class WashingMachine:
         while self.state is not None:
             self.state.handle_input(self)
 
-    def change_state(self, new_state: State) -> None:
+    def change_state(self, new_state: WashingMachineStateInterface) -> None:
         self.state = new_state
 
     def change_door_locked_status(self, new_door_locked_status: bool) -> None:

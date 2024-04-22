@@ -32,9 +32,9 @@ from enums import (
     WashSettingsOptions,
 )
 from models import (
-    State,
     WashingMachineBalanceInterface,
     WashingMachineInterface,
+    WashingMachineStateInterface,
     WashingMachineStatisticsInterface,
 )
 from utils import (
@@ -89,7 +89,7 @@ Balance: ${self.money_earned:.2f}
 ------------------------------------------------------------------------"""
 
 
-class SelectWashMenuState(State):
+class SelectWashMenuState(WashingMachineStateInterface):
     def handle_input(self, washing_machine: WashingMachineInterface):
         while True:
 
@@ -145,7 +145,7 @@ class SelectWashMenuState(State):
         print(END_WASH_DISPLAY)
 
 
-class InsertCoinMenuState(State):
+class InsertCoinMenuState(WashingMachineStateInterface):
     def handle_input(self, washing_machine: WashingMachineInterface):
         while True:
             insert_coin_input = get_user_menu_input(
@@ -159,7 +159,7 @@ class InsertCoinMenuState(State):
             print(washing_machine.balance)
 
 
-class WashSettingsMenuState(State):
+class WashSettingsMenuState(WashingMachineStateInterface):
     def handle_input(self, washing_machine: WashingMachineInterface):
         wash_settings_input = get_user_menu_input(
             MENU_WASH_SETTINGS_DISPLAY, USER_INPUT_TO_WASH_SETTINGS_OPTIONS_MAPPING
@@ -174,7 +174,7 @@ class WashSettingsMenuState(State):
             washing_machine.change_state(StartMenuState())
 
 
-class MaintenanceMenuState(State):
+class MaintenanceMenuState(WashingMachineStateInterface):
     def handle_input(self, washing_machine: WashingMachineInterface):
         while True:
             maintenance_menu_input = get_user_menu_input(
@@ -190,7 +190,7 @@ class MaintenanceMenuState(State):
                 break
 
 
-class StartMenuState(State):
+class StartMenuState(WashingMachineStateInterface):
     def handle_input(self, washing_machine: WashingMachineInterface):
         start_menu_input = get_user_menu_input(
             MENU_START_DISPLAY, USER_INPUT_TO_START_OPTIONS_MAPPING

@@ -39,7 +39,7 @@ class WashingMachineStatisticsInterface(ABC):
         pass
 
 
-class State(ABC):
+class WashingMachineStateInterface(ABC):
     def handle_input(self, context):
         raise NotImplementedError
 
@@ -47,7 +47,7 @@ class State(ABC):
 class WashingMachineInterface(ABC):
     def __init__(
         self,
-        state: State,
+        state: WashingMachineStateInterface,
         statistics: WashingMachineStatisticsInterface,
         balance: WashingMachineBalanceInterface,
         is_door_locked=False,

@@ -25,6 +25,7 @@ def get_user_menu_input(
     display_message: str,
     options_mapping: dict[str, T],
     prompt_message: str = PROMPT_INPUT,
+    invalid_selection_display: str = INVALID_SELECTION_DISPLAY,
 ) -> T:
     while True:
         try:
@@ -32,7 +33,7 @@ def get_user_menu_input(
             user_input = input(prompt_message)
             return get_menu_option(user_input, options_mapping)
         except InvalidMenuSelectionError:
-            print(INVALID_SELECTION_DISPLAY)
+            print(invalid_selection_display)
 
 
 def topup_washing_machine(
