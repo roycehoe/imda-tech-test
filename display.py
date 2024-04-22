@@ -83,12 +83,6 @@ What would you like to do?
 Otherwise, press [0] to go back"""
 
 
-def get_refund_excess_display(excess_amount: float) -> str:
-    return f"""
-========Calculating change===========
-Clonk clonk. ${excess_amount} refunded"""
-
-
 def get_washing_job_progress_display(
     progress_percentage: float, remaining_time_minutes: int
 ) -> str:
@@ -96,4 +90,3 @@ def get_washing_job_progress_display(
 Current progress: {progress_percentage * 100:.0f}%
 Remaining time: {remaining_time_minutes} mins
 ...................................."""
-

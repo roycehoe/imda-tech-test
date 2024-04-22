@@ -5,7 +5,14 @@ from controller import (
     WashingMachineStatistics,
 )
 
-washing_machine = WashingMachine(WashingMachineStatistics(), WashingMachineBalance())
-controller = StartMenuController(washing_machine)
-washing_machine.change_controller(controller)
+
+def init_washing_machine() -> WashingMachine:
+    washing_machine = WashingMachine(
+        WashingMachineStatistics(), WashingMachineBalance()
+    )
+    washing_machine.change_controller(StartMenuController(washing_machine))
+    return washing_machine
+
+
+washing_machine = init_washing_machine()
 washing_machine.run()
