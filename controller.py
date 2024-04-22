@@ -258,7 +258,7 @@ class WashSettingsMenuController:
     view = WashSettingsMenuView()
 
     def __post_init__(self):
-        self.model = MaintenanceMenuModel(state=self.state)
+        self.model = WashSettingsMenuModel(state=self.state)
 
     def run(self):
         self.handle_user_input()
@@ -270,13 +270,17 @@ class WashSettingsMenuController:
             parsed_user_input = self.model.parse_user_input(user_input)
 
             if parsed_user_input == WashSettingsOptions.INSERT_COINS:
-                self.model.change_machine_state(InsertCoinMenuController(self.state))
+                self.state.change_controller(InsertCoinMenuController(self.state))
+                break
 
-            # if parsed_user_input == WashSettingsOptions.SELECT_WASH:
-            #     washing_machine.change_state(SelectWashMenuState())
+            if parsed_user_input == WashSettingsOptions.SELECT_WASH:
+                self.state.change_controller(SelectWashMenuController(self.state))
+                break
 
             if parsed_user_input == WashSettingsOptions.GO_BACK:
-                self.model.change_machine_state(StartMenuController(self.state))
+                # self.model.change_machine_state(StartMenuController(self.state))
+                self.state.change_controller(StartMenuController(self.state))
+                break
 
 
 @dataclass
@@ -350,61 +354,6 @@ class SelectWashMenuView:
 Clonk clonk. ${refund_amount} refunded"""
 
 
-# def handle_input(self, washing_machine: WashingMachineInterface):
-#     while True:
-
-#         selected_wash_input = get_user_menu_input(
-#             get_menu_select_wash_display(washing_machine.balance.balance),
-#             USER_INPUT_TO_SELECT_WASH_OPTIONS_MAPPING,
-#         )
-#         if selected_wash_input == SelectWashOptions.GO_BACK:
-#             washing_machine.change_state(WashSettingsMenuState())
-#             break
-
-#         wash_price = get_wash_price(selected_wash_input)
-#         wash_time = get_wash_time(selected_wash_input)
-#         select_wash_outcome = get_select_wash_outcome(
-#             washing_machine.balance.balance, wash_price
-#         )
-#         if select_wash_outcome == SelectWashOutcome.BALANCE_LESS_THAN_WASH_PRICE:
-#             print(INSUFFICIENT_FUNDS_DISPLAY)
-#             return
-
-#         self._handle_payment(washing_machine, select_wash_outcome, wash_price)
-#         self._handle_wash_clothes(washing_machine, wash_time)
-#         washing_machine.change_state(StartMenuState())
-#         break
-
-# def _handle_payment(
-#     self,
-#     washing_machine: WashingMachineInterface,
-#     outcome: SelectWashOutcome,
-#     wash_price: float,
-# ):
-#     if outcome == SelectWashOutcome.BALANCE_MORE_THAN_WASH_PRICE:
-#         refund_amount = get_refund_amount(
-#             washing_machine.balance.balance, wash_price
-#         )
-#         refund_amount_display = get_refund_excess_display(refund_amount)
-#         print(refund_amount_display)
-
-#     washing_machine.balance.reset_balance(wash_price)
-#     washing_machine.statistics.add_money_earned(wash_price)
-
-# def _handle_wash_clothes(
-#     self,
-#     washing_machine: WashingMachineInterface,
-#     wash_time: int,
-# ):
-#     washing_machine.statistics.add_total_time_switched_on_minutes(wash_time)
-
-#     washing_machine.change_door_locked_status(True)
-#     print(START_WASH_DISPLAY)
-#     simulate_washing_progress(wash_time)
-#     washing_machine.change_door_locked_status(False)
-#     print(END_WASH_DISPLAY)
-
-
 @dataclass
 class SelectWashMenuController:
     state: WashingMachine
@@ -446,6 +395,7 @@ class SelectWashMenuController:
             self.model.change_washing_machine_door_lock_status(False)
             print(self.view.end_wash)
             self.model.change_machine_controller(StartMenuController(self.state))
+            break
 
 
 washing_machine = WashingMachine(WashingMachineStatistics(), WashingMachineBalance())
