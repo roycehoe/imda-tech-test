@@ -1,7 +1,42 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from state import WashingMachineBalance, WashingMachineStatistics
+
+@dataclass
+class WashingMachineBalanceInterface(ABC):
+    balance: float
+
+    @abstractmethod
+    def topup_balance(self, money: float):
+        pass
+
+    @abstractmethod
+    def reset_balance(self, money: float):
+        pass
+
+    def __str__(self):
+        pass
+
+
+@dataclass
+class WashingMachineStatisticsInterface(ABC):
+    total_time_switched_on_minutes: int
+    money_earned: float
+
+    @abstractmethod
+    def reset(self):
+        pass
+
+    @abstractmethod
+    def add_total_time_switched_on_minutes(self, additional_time: int):
+        pass
+
+    @abstractmethod
+    def add_money_earned(self, additional_money_earned: float):
+        pass
+
+    def __str__(self):
+        pass
 
 
 class State(ABC):
@@ -13,8 +48,8 @@ class WashingMachineInterface(ABC):
     def __init__(
         self,
         state: State,
-        statistics: WashingMachineStatistics,
-        balance: WashingMachineBalance,
+        statistics: WashingMachineStatisticsInterface,
+        balance: WashingMachineBalanceInterface,
         is_door_locked=False,
     ):
         self.state = state

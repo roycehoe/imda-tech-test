@@ -10,7 +10,7 @@ from display import (
 )
 from enums import InsertCoinOptions, SelectWashOptions, SelectWashOutcome
 from exceptions import InvalidCoinValueError, InvalidMenuSelectionError
-from models import WashingMachineBalance
+from models import WashingMachineBalanceInterface
 
 T = TypeVar("T", bound=Enum)
 
@@ -36,7 +36,7 @@ def get_user_menu_input(
 
 
 def topup_washing_machine(
-    washing_machine_balance: WashingMachineBalance,
+    washing_machine_balance: WashingMachineBalanceInterface,
     insert_coin_input: InsertCoinOptions,
     coin_value_mapping: dict[
         InsertCoinOptions, float

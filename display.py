@@ -117,5 +117,5 @@ Please select one of the following washes:
 
 Otherwise, press [0] to go back"""
 
-class WashingMachineDisplay:
-    ...
+
+class WashingMachineDisplay: ...
