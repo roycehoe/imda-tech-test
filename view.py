@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+from base import WashingMachineInterface
 from display import (
     END_WASH_DISPLAY,
     EXIT_DISPLAY,
@@ -14,7 +15,6 @@ from display import (
     STATISTICS_RESET_SUCCESS_DISPLAY,
     TOPUP_SUCCESS_DISPLAY,
 )
-from models import WashingMachineInterface
 
 
 @dataclass
