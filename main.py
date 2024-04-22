@@ -5,7 +5,6 @@ from controller import (
     WashingMachineStatistics,
 )
 
-
 washing_machine = WashingMachine(WashingMachineStatistics(), WashingMachineBalance())
 controller = StartMenuController(washing_machine)
 washing_machine.change_controller(controller)

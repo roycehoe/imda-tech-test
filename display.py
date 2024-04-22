@@ -97,22 +97,3 @@ Current progress: {progress_percentage * 100:.0f}%
 Remaining time: {remaining_time_minutes} mins
 ...................................."""
 
-
-def get_menu_select_wash_display(current_balance: float) -> str:
-    return f"""
--------------------------------------
-------------Select Wash--------------
--------------------------------------
-      
--------------------------------------
-Current balance: {current_balance:.2f}
--------------------------------------
-
-Please select one of the following washes:
-
-[1] Quick Wash: 10 mins - $2.00
-[2] Mild Wash: 30 mins - $2.50
-[3] Medium Wash: 45 mins - $4.20
-[4] Heavy Wash: 1 hour - $6.00
-
-Otherwise, press [0] to go back"""

@@ -12,21 +12,6 @@ from constants import (
     USER_INPUT_TO_WASH_SETTINGS_OPTIONS_MAPPING,
     WashingTypeData,
 )
-from display import (
-    END_WASH_DISPLAY,
-    EXIT_DISPLAY,
-    INSUFFICIENT_FUNDS_DISPLAY,
-    INVALID_SELECTION_DISPLAY,
-    MENU_INSERT_COIN_DISPLAY,
-    MENU_MAINTENANCE_DISPLAY,
-    MENU_START_DISPLAY,
-    MENU_WASH_SETTINGS_DISPLAY,
-    PROMPT_INPUT,
-    START_WASH_DISPLAY,
-    STATISTICS_RESET_SUCCESS_DISPLAY,
-    TOPUP_SUCCESS_DISPLAY,
-    get_menu_select_wash_display,
-)
 from enums import (
     InsertCoinOptions,
     MaintenanceOptions,
@@ -38,6 +23,13 @@ from enums import (
 from exceptions import InvalidCoinValueError, InvalidMenuSelectionError
 from models import WashingMachineBalanceInterface, WashingMachineStatisticsInterface
 from utils import get_refund_amount, get_wash_outcome, simulate_washing_progress
+from view import (
+    InsertCoinMenuView,
+    MaintenanceMenuView,
+    SelectWashMenuView,
+    StartMenuView,
+    WashSettingsMenuView,
+)
 
 
 @dataclass
@@ -125,18 +117,6 @@ class InsertCoinMenuModel:
 
 
 @dataclass
-class InsertCoinMenuView:
-    state: WashingMachine
-    menu = MENU_INSERT_COIN_DISPLAY
-    topup_success = TOPUP_SUCCESS_DISPLAY
-    invalid_selection = INVALID_SELECTION_DISPLAY
-    prompt_input = PROMPT_INPUT
-
-    def __post_init__(self):
-        self.balance = self.state.balance
-
-
-@dataclass
 class InsertCoinMenuController:
     state: WashingMachine
 
@@ -182,14 +162,6 @@ class StartMenuModel:
         if selected_option := self.input_mapping.get(user_input):
             return selected_option
         raise InvalidMenuSelectionError
-
-
-@dataclass
-class StartMenuView:
-    menu = MENU_START_DISPLAY
-    invalid_selection = INVALID_SELECTION_DISPLAY
-    prompt_input = PROMPT_INPUT
-    exit = EXIT_DISPLAY
 
 
 @dataclass
@@ -243,20 +215,6 @@ class MaintenanceMenuModel:
 
 
 @dataclass
-class MaintenanceMenuView:
-    state: WashingMachine
-
-    menu = MENU_MAINTENANCE_DISPLAY
-    invalid_selection = INVALID_SELECTION_DISPLAY
-    prompt_input = PROMPT_INPUT
-    statistics_reset_success = STATISTICS_RESET_SUCCESS_DISPLAY
-    statistics = None
-
-    def __post_init__(self):
-        self.statistics = self.state.statistics
-
-
-@dataclass
 class MaintenanceMenuController:
     state: WashingMachine
 
@@ -300,13 +258,6 @@ class WashSettingsMenuModel:
         if selected_option := self.input_mapping.get(user_input):
             return selected_option
         raise InvalidMenuSelectionError
-
-
-@dataclass
-class WashSettingsMenuView:
-    menu = MENU_WASH_SETTINGS_DISPLAY
-    invalid_selection = INVALID_SELECTION_DISPLAY
-    prompt_input = PROMPT_INPUT
 
 
 @dataclass
@@ -382,25 +333,6 @@ class SelectWashMenuModel:
 
     def change_washing_machine_door_lock_status(self, new_status: bool) -> None:
         self.state.change_door_locked_status(new_status)
-
-
-@dataclass
-class SelectWashMenuView:
-    state: WashingMachine
-    invalid_selection = INVALID_SELECTION_DISPLAY
-    prompt_input = PROMPT_INPUT
-    insufficient_funds = INSUFFICIENT_FUNDS_DISPLAY
-    start_wash = START_WASH_DISPLAY
-    end_wash = END_WASH_DISPLAY
-    menu = None
-
-    def __post_init__(self):
-        self.menu = get_menu_select_wash_display(self.state.balance.balance)
-
-    def get_refund_amount_display(self, refund_amount: float) -> str:
-        return f"""
-========Calculating change===========
-Clonk clonk. ${refund_amount} refunded"""
 
 
 @dataclass
