@@ -11,7 +11,7 @@ class WashingMachineBalanceInterface(ABC):
         pass
 
     @abstractmethod
-    def reset_balance(self, money: float):
+    def reduce_balance(self, money: float):
         pass
 
     def __str__(self):

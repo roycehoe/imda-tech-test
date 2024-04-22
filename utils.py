@@ -2,7 +2,7 @@ import time
 from enum import Enum
 from typing import TypeVar
 
-from constants import DEFAULT_WASHING_TYPES, INSERT_COIN_OPTIONS_TO_COIN_VALUE_MAPPING
+from constants import DEFAULT_WASH_DATA, INSERT_COIN_OPTIONS_TO_COIN_VALUE_MAPPING
 from display import (
     INVALID_SELECTION_DISPLAY,
     PROMPT_INPUT,
@@ -58,22 +58,22 @@ def get_select_wash_outcome(balance: float, wash_price: float) -> SelectWashOutc
 
 def get_wash_price(selected_wash: SelectWashOptions) -> float:
     if selected_wash == SelectWashOptions.QUICK_WASH:
-        return DEFAULT_WASHING_TYPES.QUICK_WASH.price
+        return DEFAULT_WASH_DATA.QUICK_WASH.price
     if selected_wash == SelectWashOptions.MILD_WASH:
-        return DEFAULT_WASHING_TYPES.MILD_WASH.price
+        return DEFAULT_WASH_DATA.MILD_WASH.price
     if selected_wash == SelectWashOptions.MEDIUM_WASH:
-        return DEFAULT_WASHING_TYPES.MEDIUM_WASH.price
-    return DEFAULT_WASHING_TYPES.HEAVY_WASH.price
+        return DEFAULT_WASH_DATA.MEDIUM_WASH.price
+    return DEFAULT_WASH_DATA.HEAVY_WASH.price
 
 
 def get_wash_time(selected_wash: SelectWashOptions) -> int:
     if selected_wash == SelectWashOptions.QUICK_WASH:
-        return DEFAULT_WASHING_TYPES.QUICK_WASH.time
+        return DEFAULT_WASH_DATA.QUICK_WASH.time
     if selected_wash == SelectWashOptions.MILD_WASH:
-        return DEFAULT_WASHING_TYPES.MILD_WASH.time
+        return DEFAULT_WASH_DATA.MILD_WASH.time
     if selected_wash == SelectWashOptions.MEDIUM_WASH:
-        return DEFAULT_WASHING_TYPES.MEDIUM_WASH.time
-    return DEFAULT_WASHING_TYPES.HEAVY_WASH.time
+        return DEFAULT_WASH_DATA.MEDIUM_WASH.time
+    return DEFAULT_WASH_DATA.HEAVY_WASH.time
 
 
 def get_refund_amount(balance: float, wash_price: float) -> float:

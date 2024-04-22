@@ -24,7 +24,7 @@ class WashingTypes:
     HEAVY_WASH: Final = WashingTypeData(60, 6.00)
 
 
-DEFAULT_WASHING_TYPES = WashingTypes()
+DEFAULT_WASH_DATA = WashingTypes()
 DEFAULT_TOTAL_TIME_SWITCHED_ON_MINUTES = 0
 DEFAULT_MONEY_EARNED = 0.00
 

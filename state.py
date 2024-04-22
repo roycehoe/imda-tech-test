@@ -55,7 +55,7 @@ class WashingMachineBalance(WashingMachineBalanceInterface):
     def topup_balance(self, money: float):
         self.balance += money
 
-    def reset_balance(self, money: float):
+    def reduce_balance(self, money: float):
         self.balance -= money
 
     def __str__(self):
@@ -128,7 +128,7 @@ class SelectWashMenuState(WashingMachineStateInterface):
             refund_amount_display = get_refund_excess_display(refund_amount)
             print(refund_amount_display)
 
-        washing_machine.balance.reset_balance(wash_price)
+        washing_machine.balance.reduce_balance(wash_price)
         washing_machine.statistics.add_money_earned(wash_price)
 
     def _handle_wash_clothes(
